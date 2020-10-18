@@ -1,0 +1,44 @@
+<apex:page id="Registration" showHeader="false" controller="AL_SiteRegisterController" title="Register">
+    <apex:define name="body">  
+      <center>
+        <apex:panelGrid bgcolor="white" columns="1"> 
+          <br/>
+          <br/>
+          <apex:panelGrid width="758" cellpadding="0" cellspacing="0" bgcolor="white" columns="1" styleClass="topPanelContainer"> 
+            <br/>
+            <apex:outputPanel layout="block" styleClass="topPanel">
+              <apex:panelGrid width="758" cellpadding="0" cellspacing="0" bgcolor="white" columns="2"> 
+
+                <apex:panelGroup >
+                  <br/>
+                  <apex:outputText styleClass="title" value="New User Registration"/>
+                  <br/>
+                  <apex:form id="theForm" forceSSL="true">
+                    <apex:pageMessages id="error"/>
+                    <apex:panelGrid columns="2" style="margin-top:1em;">
+                      <apex:outputLabel value="First and Last Name" for="name"/>
+                      <apex:inputText required="true" id="name" value="{!name}"/>
+                      <apex:outputLabel value="LoginName" for="loginName"/>
+                      <apex:inputText required="true" id="loginName" value="{!loginName}"/>
+                      <apex:outputLabel value="Password" for="password"/>
+                      <apex:inputSecret required="true" id="password" value="{!password}"/>
+                      <apex:outputLabel value="Confirm Password" for="confirmPassword"/>
+                      <apex:inputSecret required="true" id="confirmPassword" value="{!confirmPassword}"/>
+                      <apex:outputLabel value="State" for="state"/>
+                      <apex:inputSecret required="true" id="state" value="{!state}"/> 
+                      <apex:outputLabel value="City" for="city"/>
+                      <apex:inputSecret required="true" id="city" value="{!city}"/>                        
+                      <apex:outputText value=""/>
+                      <apex:commandButton action="{!registerUser}" value="Submit" id="submit"/>
+                    </apex:panelGrid> 
+                    </apex:form>                  
+                  <br/>
+                </apex:panelGroup>
+              </apex:panelGrid> 
+             </apex:outputPanel>
+          </apex:panelGrid> 
+       </apex:panelGrid>
+      </center>
+      <br/>
+    </apex:define>
+</apex:page>

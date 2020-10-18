@@ -1,0 +1,15 @@
+<apex:page showHeader="false" sidebar="false" controller="AL_SiteLoginController">
+  <apex:form >
+      <center>
+        <apex:outputLabel value="Login Name:" for="username"/>
+        <apex:inputText id="username" value="{!username}"/><br/>
+        <apex:outputLabel value="Password:" for="password"/>
+        <apex:inputSecret id="password" value="{!password}"/><br/>
+        <apex:outputText value=""/>
+    <apex:commandButton action="{!login}" value="Login" id="loginButton"/><br />
+       <!--apex:outputLink value="{!$Page.AL_UserHomePage?id={!userId}}">Register Here</apex:outputLink-->
+             <br/><br/>
+    <apex:outputLink value="{!$Page.AL_SiteRegister}">Register Here</apex:outputLink>   
+    </center>
+  </apex:form>
+</apex:page>
