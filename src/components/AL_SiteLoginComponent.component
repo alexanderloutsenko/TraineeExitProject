@@ -8,15 +8,12 @@
         <apex:outputLabel value="Password:" for="password"/>
         <apex:inputSecret id="password" value="{!password}"/>
         <apex:outputText value=""/>
-        <apex:commandButton action="{!login}" value="Login" id="loginButton">
-            <apex:param value="{!$CurrentPage.URL}" assignTo="{!currentUrl}" />
-        </apex:commandButton>
+        <apex:commandButton action="{!login}" value="Login" id="loginButton" />
         <apex:outputText value=""/>
         <apex:outputText value=""/>
         <apex:outputText value=""/>
         <apex:panelGroup id="theLinks">
-          <apex:outputLink value="{!$Page.ForgotPassword}">Forgot your password?</apex:outputLink>
-            <br/><br/>
+           <br/><br/>
           <apex:outputLink value="{!$Page.AL_SiteRegister}">Register Here</apex:outputLink>
         </apex:panelGroup>
       </apex:panelGrid> 
