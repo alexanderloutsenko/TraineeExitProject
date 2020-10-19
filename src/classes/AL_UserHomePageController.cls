@@ -1,4 +1,4 @@
-public with sharing class AL_UserHomePageController {
+public class AL_UserHomePageController {
 
     public AL_UserHomePageController () {}
 

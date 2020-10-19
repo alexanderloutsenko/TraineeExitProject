@@ -1,0 +1,9 @@
+<apex:page sidebar="false" showHeader="false" controller="AL_SiteRegisterController">
+<apex:form id="registerForm">
+<apex:pageMessages />
+    First and Last Name:<apex:inputText id="name" value="{!name}"/><br/><br/>
+    LoginName:          <apex:inputText required="true" id="loginName" value="{!loginName}"/><br/><br/>
+    Password:           <apex:inputSecret required="true" id="password" value="{!password}"/><br/><br/>
+              <apex:commandButton action="{!registerUser}" value="Submit" id="submit" reRender="registerForm"/>     
+</apex:form>
+</apex:page>

@@ -16,8 +16,8 @@
                   <apex:form id="theForm" forceSSL="true">
                     <apex:pageMessages id="error"/>
                     <apex:panelGrid columns="2" style="margin-top:1em;">
-                      <apex:outputLabel value="First and Last Name" for="name"/>
-                      <apex:inputText required="true" id="name" value="{!name}"/>
+                      <apex:outputLabel value="First & Last Name" for="name"/>
+                      <apex:inputText  id="name" value="{!name}"/>
                       <apex:outputLabel value="LoginName" for="loginName"/>
                       <apex:inputText required="true" id="loginName" value="{!loginName}"/>
                       <apex:outputLabel value="Password" for="password"/>
@@ -25,9 +25,9 @@
                       <apex:outputLabel value="Confirm Password" for="confirmPassword"/>
                       <apex:inputSecret required="true" id="confirmPassword" value="{!confirmPassword}"/>
                       <apex:outputLabel value="State" for="state"/>
-                      <apex:inputSecret required="true" id="state" value="{!state}"/> 
+                      <apex:inputText required="true" id="state" value="{!state}"/> 
                       <apex:outputLabel value="City" for="city"/>
-                      <apex:inputSecret required="true" id="city" value="{!city}"/>                        
+                      <apex:inputText required="true" id="city" value="{!city}"/>                        
                       <apex:outputText value=""/>
                       <apex:commandButton action="{!registerUser}" value="Submit" id="submit"/>
                     </apex:panelGrid> 
