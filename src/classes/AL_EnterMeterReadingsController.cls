@@ -1,8 +1,9 @@
 public class AL_EnterMeterReadingsController {
     public static Datetime dynamicMonth { get { return Datetime.now().addMonths(-1); } }
-    public string pageRef = System.currentPageReference().getURL();
+    //public string pageRef = System.currentPageReference().getURL();
     public WrapPublicUserData activePublicUser { get; set; }
     public Monthly_Payment__c payRec { get; set; }
+    public String selectedPaymentType { get; set; }
     public Integer electro { get; set; }
     public Integer gas { get; set; }
     public Integer water { get; set; }
@@ -18,7 +19,8 @@ public class AL_EnterMeterReadingsController {
                              						WHERE id = :publicUserId]);
         // check whether the user already has a payment for last month
         List<Monthly_Payment__c> payRecsByUser = [
-            	  SELECT Electricity_Meter_Readings__c,
+            	  SELECT Id,
+                         Electricity_Meter_Readings__c,
                   		 Gas_Meter_Readings__c,
                   		 Water_Meter_Readings__c,
                   		 Payment_Closed_Date__c,
@@ -41,12 +43,23 @@ public class AL_EnterMeterReadingsController {
            payRec = payRecsByUser[0]; // if payment already exists show meter readings in read-only mode
         }
     }
-    
-    public PageReference noPaymentYet () {
+    // check whether the payment record for last month already exists
+    public PageReference noPaymentYet() {
         ApexPages.addMessage(new ApexPages.message(ApexPages.severity.WARNING,noPaymentYet));
         return null;
     }
-    
+    // Payment_Fullness__c picklist population
+    public List<SelectOption> getOptions() {
+        List<SelectOption> payOptions = new List<SelectOption>();        
+        Schema.DescribeFieldResult fieldResult = Monthly_Payment__c.Payment_Fullness__c.getDescribe();
+        List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
+        
+        for( Schema.PicklistEntry f : ple) {
+            payOptions.add(new SelectOption(f.getLabel(), f.getValue()));
+        }       
+        return payOptions;
+    }
+
     public PageReference saveReadings() {
         Monthly_Payment__c dataToSubmit = new Monthly_Payment__c();
         dataToSubmit.Electricity_Meter_Readings__c = electro;
@@ -62,14 +75,54 @@ public class AL_EnterMeterReadingsController {
         // and the data helping with future calculations populated
         insert dataToSubmit;
         // refresh current page
-		/*PageReference pageRef = new PageReference(ApexPages.currentPage().getUrl());
-		pageRef.setRedirect(true);
-		return pageRef;*/
-        return null;
+        return new PageReference('/AL_EnterMeterReadings?id='+activePublicUser.pubUserId);
+    }
+
+    public void checkPaymentFullness(Decimal mustPay, Decimal wantPay) {
+        if(mustPay > wantPay && wantPay != 0) {
+            selectedPaymentType = 'Partially';
+             //System.debug('(1) if(mustPay > wantPay && wantPay != 0) = '+selectedPaymentType);                  
+        } else {
+            selectedPaymentType = 'Fully';
+            customSum = payRec.Recommended_Payment_Sum__c;             
+              //System.debug('(2) ELSE (mustPay <= wantPay) || wantPay == 0) = '+selectedPaymentType);  
+        } 
     }
     
-    public void doPayment() {
-        
+    public PageReference showMessage() {
+        ApexPages.addMessage(new ApexPages.message(ApexPages.severity.WARNING,'Enter sum no less then 20$'));
+        return null;        
+    }
+
+    public PageReference doPayment() {
+        //first, perform REST Api with payment
+        /* here will be the code to perform REST Api with payment 
+        */
+
+        //second, form Payment record to fulfill it with payment data     
+        checkPaymentFullness(payRec.Recommended_Payment_Sum__c, customSum);
+    
+        Monthly_Payment__c payRecToUpdate = new Monthly_Payment__c();
+        payRecToUpdate.Id = payRec.Id;
+        if(selectedPaymentType == 'Partially') {
+            payRecToUpdate.Payment_Status__c = 'Partial';// consider to get rid of this field by removing it from the object
+        } else {
+            payRecToUpdate.Payment_Status__c = 'Closed';// consider to get rid of this field by removing it the object
+            payRecToUpdate.Payment_Closed_Date__c = Datetime.now();
+        }
+        payRecToUpdate.Payment_Fullness__c = selectedPaymentType;
+        payRecToUpdate.Sum_Already_Payed__c = customSum;       		 
+        System.debug('** '+payRecToUpdate);  
+        //update Monthly_Payment__c record with payment data
+        try{
+            update payRecToUpdate;
+        }
+        catch(DmlException ex){
+            ApexPages.addMessages(ex);
+        }
+
+        ApexPages.addMessage(new ApexPages.message(ApexPages.severity.WARNING,'Your payment is successfull'));
+        return null;
     }
     
         //  wrapper class
