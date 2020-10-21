@@ -1,15 +1,16 @@
-<apex:page controller="AL_UserHomePageController" showHeader="false" sidebar="false"> <!-- standardController="Public_User__c"  {!Public_User__c.Id} -->
+<apex:page controller="AL_UserHomePageController" showHeader="false" sidebar="false"> 
 <h1>Hi user! {!$CurrentPage.parameters.id}</h1>
 <apex:form >
       <apex:pageBlock >
           <apex:outputText value="{!$CurrentPage.parameters.id}"></apex:outputText><br/>
-          <apex:outputText value="{!$CurrentPage.URL}"></apex:outputText>
           <apex:pageBlockButtons >              
-              <apex:outputLink value="{!$Page.AL_EnterMeterReadings}" styleClass="btn" style="text-decoration:none;padding:4px;" >Enter Meter Readings
-                  <!--apex:param value="{!$CurrentPage.Parameters}" assignTo="" -->
+              <apex:outputLink value="{!$Page.AL_EnterMeterReadings+'?id='+$CurrentPage.parameters.id}" styleClass="btn" style="text-decoration:none;padding:4px;" >Enter Meter Readings
+              </apex:outputLink>      
+              <apex:outputLink value="{!$Page.AL_ShowPaymentHistory+'?id='+$CurrentPage.parameters.id}" styleClass="btn" style="text-decoration:none;padding:4px;" >View Payment History
               </apex:outputLink>
-              <!--apex:outputLink value="{!$Page.AL_DoPayment}">Do Payment</apex:outputLink-->
-             
+              <!--apex:outputLink value="{!$Page.AL_ChangeResidence}" styleClass="btn" style="text-decoration:none;padding:4px;" >Change Region Details
+              </apex:outputLink-->
+              <!--apex:outputLink value="{!$Page.AL_DoPayment}">Do Payment</apex:outputLink-->             
           </apex:pageBlockButtons>
     </apex:pageBlock>
     </apex:form>

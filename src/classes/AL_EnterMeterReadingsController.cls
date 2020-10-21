@@ -2,6 +2,7 @@ public class AL_EnterMeterReadingsController {
     public static Datetime dynamicMonth { get { return Datetime.now().addMonths(-1); } }
     //public string pageRef = System.currentPageReference().getURL();
     public WrapPublicUserData activePublicUser { get; set; }
+    String publicUserId ;
     public Monthly_Payment__c payRec { get; set; }
     public String selectedPaymentType { get; set; }
     public Integer electro { get; set; }
@@ -12,11 +13,40 @@ public class AL_EnterMeterReadingsController {
      
     public AL_EnterMeterReadingsController() {
         // get public user id from URL       
-        String publicUserId = System.CurrentPageReference().getParameters().get('id');
+        publicUserId = System.CurrentPageReference().getParameters().get('id');
         // get user data + user's region
         activePublicUser = new WrapPublicUserData([SELECT id, Name, Region__c 
                               						 FROM Public_User__c 
                              						WHERE id = :publicUserId]);
+        // check whether the user already has a payment for last month
+        getPaymentData();
+        /*List<Monthly_Payment__c> payRecsByUser = [
+            	  SELECT Id,
+                         Electricity_Meter_Readings__c,
+                  		 Gas_Meter_Readings__c,
+                  		 Water_Meter_Readings__c,
+                  		 Payment_Closed_Date__c,
+                  		 Payment_Month__c,
+                  		 Payment_Fullness__c,
+                  		 Payment_Status__c,
+                  	     Public_User__c,
+                  		 Rates__c,
+                  		 Region__c,
+                  		 Recommended_Payment_Sum__c,
+                         Remaining_Sum_for_Payment__c,
+						 Sum_Already_Payed__c                  		 
+                 	FROM Monthly_Payment__c
+                   WHERE Public_User__c = :publicUserId
+                     AND Payment_Month__c = :dynamicMonth.format('MMMM')];
+        
+        if(payRecsByUser.size() == 0) {
+           noPaymentYet(); // if no payment exists show warning and input fields for inputing meter readings                   
+        } else {
+           payRec = payRecsByUser[0]; // if payment already exists show meter readings in read-only mode
+        }*/
+    }
+
+    public void getPaymentData() {
         // check whether the user already has a payment for last month
         List<Monthly_Payment__c> payRecsByUser = [
             	  SELECT Id,
@@ -54,7 +84,7 @@ public class AL_EnterMeterReadingsController {
         Schema.DescribeFieldResult fieldResult = Monthly_Payment__c.Payment_Fullness__c.getDescribe();
         List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
         
-        for( Schema.PicklistEntry f : ple) {
+        for(Schema.PicklistEntry f : ple) {
             payOptions.add(new SelectOption(f.getLabel(), f.getValue()));
         }       
         return payOptions;
@@ -76,17 +106,32 @@ public class AL_EnterMeterReadingsController {
         insert dataToSubmit;
         // refresh current page
         return new PageReference('/AL_EnterMeterReadings?id='+activePublicUser.pubUserId);
+        //return null;    
     }
 
     public void checkPaymentFullness(Decimal mustPay, Decimal wantPay) {
-        if(mustPay > wantPay && wantPay != 0) {
-            selectedPaymentType = 'Partially';
-             //System.debug('(1) if(mustPay > wantPay && wantPay != 0) = '+selectedPaymentType);                  
+        // check whether this is additional payment for current Payment record
+        System.debug('**befor IFs in checkPaymentFullness() -- mustPay='+mustPay+', wantPay='+wantPay+', payRec.Sum_Already_Payed__c='+payRec.Sum_Already_Payed__c);
+        if(payRec.Sum_Already_Payed__c == 0 || payRec.Sum_Already_Payed__c == null ) { // first time payment
+            if(mustPay > wantPay && wantPay != 0) {
+                selectedPaymentType = 'Partially';
+                //System.debug('(1) if(mustPay > wantPay && wantPay != 0) = '+selectedPaymentType);                  
+            } else {
+                selectedPaymentType = 'Fully';
+                customSum = payRec.Recommended_Payment_Sum__c;             
+                //System.debug('(2) ELSE (mustPay <= wantPay) || wantPay == 0) = '+selectedPaymentType);  
+            } 
         } else {
-            selectedPaymentType = 'Fully';
-            customSum = payRec.Recommended_Payment_Sum__c;             
-              //System.debug('(2) ELSE (mustPay <= wantPay) || wantPay == 0) = '+selectedPaymentType);  
-        } 
+            if(mustPay > wantPay+payRec.Sum_Already_Payed__c && wantPay != 0) { // additional payment
+                selectedPaymentType = 'Partially';
+                //System.debug('(1) if(mustPay > wantPay && wantPay != 0) = '+selectedPaymentType);                  
+            } else {
+                selectedPaymentType = 'Fully';      
+                //System.debug('(2) ELSE (mustPay <= wantPay) || wantPay == 0) = '+selectedPaymentType);  
+            } 
+            customSum = customSum + payRec.Sum_Already_Payed__c; 
+            System.debug ('** customSum in ELSE for if(payRec.Sum_Already_Payed__c == 0) is '+customSum);                 
+        }
     }
     
     public PageReference showMessage() {
@@ -96,7 +141,7 @@ public class AL_EnterMeterReadingsController {
 
     public PageReference doPayment() {
         //first, perform REST Api with payment
-        /* here will be the code to perform REST Api with payment 
+        /** here will be the code to perform REST Api with payment 
         */
 
         //second, form Payment record to fulfill it with payment data     
@@ -122,7 +167,9 @@ public class AL_EnterMeterReadingsController {
         }
 
         ApexPages.addMessage(new ApexPages.message(ApexPages.severity.WARNING,'Your payment is successfull'));
-        return null;
+        return new PageReference('/AL_UserHomePage?id='+activePublicUser.pubUserId);
+        //getPaymentData();
+        //return null;
     }
     
         //  wrapper class

@@ -1,5 +1,5 @@
 <apex:page controller="AL_EnterMeterReadingsController" showHeader="false" sidebar="false" id="thePage">
-    <h1 style="title"> <!-- standardController="Monthly_Payment__c" extensions="AL_EnterMeterReadingsController" recordSetVar="records" -->
+    <h1 style="title"> 
         Enter Meter Readings 
     </h1>
 	<h2>
@@ -7,10 +7,9 @@
     </h2>
     <apex:pageMessages id="warning" />   
     <!-- show this form when payment record for last month doesn't exist yet -->
-    <apex:form id="Enter_Meter_Readings">
-       <apex:messages id="error" styleClass="error"/>        
-        <apex:pageBlock >
-             <apex:pageblockSection title="Enter Actual Meter Readings"  id="EnterDataSection" columns="1" rendered="{!ISNULL(payRec)}" >
+    <apex:form id="Form1">    
+        <apex:pageBlock rendered="{!ISNULL(payRec)}">
+             <apex:pageblockSection title="Enter Actual Meter Readings"  id="EnterDataSection" columns="1">
               <apex:pageBlockSectionItem >
                   Payment_Month__c: <apex:outputText value="{0,date,MMMM}">
                   		<apex:param value="{!dynamicMonth}"  />
@@ -25,16 +24,16 @@
               <apex:pageBlockSectionItem >
                   Water Meter Readings (m3): <apex:inputText required="true" value="{!water}" id="water"/>
               </apex:pageBlockSectionItem>
-        		<apex:commandButton id="submitMeterReadings" action="{!saveReadings}" value="Save" reRender="thePage"/>
+        		<apex:commandButton id="submitMeterReadings" action="{!saveReadings}" value="Save Readings" style="background:#d699ff; padding: 5px 10px 5px 10px"/><!-- reRender="thePage" -->
             </apex:pageblockSection>
-         </apex:pageBlock>        
-     </apex:form>
+        </apex:pageBlock> 
+    </apex:form>       
      <!-- end of Enter_Meter_Readings form -->
     
      <!-- show this form when payment record for last month has been already created -->
-    <apex:form id="Show_Meter_Readings">     
-        <apex:pageBlock >
-             <apex:pageblockSection title="Actual Meter Readings"  id="detailSection" columns="1" rendered="{!NOT(ISNULL(payRec))}" >
+    <apex:form id="Form2">   
+         <apex:pageBlock rendered="{!NOT(ISNULL(payRec))}">
+             <apex:pageblockSection title="Actual Meter Readings"  id="detailSection" columns="1" >
               <apex:pageBlockSectionItem >
                   Payment_Month__c: <apex:outputText value="{0,date,MMMM}">
                   		<apex:param value="{!dynamicMonth}"  />
@@ -50,15 +49,17 @@
                   Water Meter Readings (m3): <apex:outputField value="{!payRec.Water_Meter_Readings__c}"/>
               </apex:pageBlockSectionItem>
             </apex:pageblockSection>
-         </apex:pageBlock>        
-     </apex:form>
+         </apex:pageBlock>
+    </apex:form>                   
      <!-- end of Show_Meter_Readings form -->
-    
-    	<apex:form id="doPayment">
-        <apex:pageBlock >
+    <apex:form id="Form3">  
+        <apex:pageBlock rendered="{!NOT(ISNULL(payRec))}">
              <apex:pageblockSection title="Payment Details"  id="PaymentSection" columns="1">          
               <apex:pageBlockSectionItem >
-                  Payment_Fullness__c	Picklist: <apex:outputField value="{!payRec.Payment_Fullness__c}"/>
+                  Payment_Fullness__c: 
+                  <apex:selectList id="Payment_Fullness" value="{!selectedPaymentType}" size="1" required="true">
+                  <apex:selectOptions value="{!options}"/>
+                  </apex:selectList>
               </apex:pageBlockSectionItem>
               <apex:pageBlockSectionItem >
                   Recommended_Payment_Sum__c: <apex:outputField value="{!payRec.Recommended_Payment_Sum__c}"/>
@@ -69,11 +70,14 @@
               <apex:pageBlockSectionItem >
                   Sum_Already_Payed__c: <apex:outputField value="{!payRec.Sum_Already_Payed__c}"/>
               </apex:pageBlockSectionItem>
+              <apex:outputText>If you desire to pay only part of recommended sum enter the sum in the below field and click Do Payment button.</apex:outputText>
               <apex:pageBlockSectionItem >
-                  Enter your sum for partial payment: <apex:inputText value="{!customSum}"/>
+                    Enter your sum for partial payment: <apex:inputText value="{!customSum}" ></apex:inputText>
               </apex:pageBlockSectionItem>
 
-          <apex:commandButton id="submitPayment" action="{!doPayment}" value="doPayment" reRender="detailSection"/>
+            <br/>
+            <apex:outputText>If you desire to pay recommended sum fully just click Do Payment button.</apex:outputText>
+          <apex:commandButton id="submitPayment" action="{!doPayment}" value="Do Payment" /><!-- reRender="detailSection" -->
                   </apex:pageblockSection>
               </apex:pageBlock>
 		</apex:form>

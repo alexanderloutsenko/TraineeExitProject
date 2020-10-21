@@ -12,7 +12,7 @@
                   <br/>
                   <apex:outputText styleClass="title" value="Communal Services Login Page"/>
                   <br/>
-                  <apex:message id="error"/>                  
+                  <apex:pageMessages id="error"/>                  
                   <apex:form id="siteLogin" > 
                     <apex:outputPanel layout="block">
                       <!--apex:pageMessages id="error"/-->
