@@ -1,10 +1,9 @@
-<apex:page id="Registration_Page" showHeader="false" controller="AL_SiteRegisterController" title="Register">
-  <apex:form id="RegistrationForm" forceSSL="true"><!--  -->
-  <apex:pageMessages id="error"/>
+<!--apex:page id="Registration_Page" showHeader="false" controller="AL_SiteRegisterController" title="Register">
+  <apex:pageMessages />
+    <apex:form id="RegistrationForm" forceSSL="true">
+ 
       <center>
            <br/>
-
-
                   <br/>
                   <apex:outputText styleClass="title" value="New User Registration"/>
                   <br/>
@@ -19,28 +18,76 @@
                       <apex:outputLabel value="Password" for="password"/>
                       <apex:inputSecret required="true" id="password" value="{!password}"/>
                       <br/>
-                      <apex:outputLabel value="Select Your State" for="states"/> 
-                      <apex:selectList id="states" value="{!selectedState}" size="1" required="true" >
-                                <apex:actionSupport event="onchange" reRender="cities" />
-                          <apex:selectOptions value="{!StateOptions}"/>
-                      </apex:selectList>
-                      <br/>
-                      <apex:outputLabel value="Select Your City" /> 
-                      <apex:selectList id="cities" value="{!selectedCity}" size="1" required="true">
-                          <apex:selectOptions value="{!CityOptions}"/>
-                      </apex:selectList>
-                      <br/> 
-                      <!--  
-                      <apex:outputLabel value="Select Your Region" for="region"/>                      
-                        <apex:selectList id="region" value="{!selectedRegion}" size="1" required="true">
-                          <apex:selectOptions value="{!options}"/>
-                        </apex:selectList>  -->   
-                        <apex:commandButton action="{!registerUser}" value="Submit" id="submit"/>                                   
+                       <apex:outputLabel value="Select Your State" for="states"/> 
+                       <apex:outputPanel id="panel">
+                       <apex:selectList id="states" value="{!selectedState}" size="1" required="true" >
+                                 <apex:actionSupport event="onchange" reRender="panel" />
+                           <apex:selectOptions value="{!StateOptions}"/>
+                       </apex:selectList>
+                       <br/>
+                       <apex:outputLabel value="Select Your City" /> 
+                       <apex:selectList id="citiesOptions" value="{!selectedCity}" size="1" required="true">
+                           <apex:selectOptions value="{!CityOptions}"/>
+                       </apex:selectList>
+                      </apex:outputPanel>
+                       <br/> 
 
-                          <!--  -->             
-
+                        <apex:commandButton action="{!registerUser}" value="Submit" id="submit"/> <p />                    
       </center>
       <br/>
-
   </apex:form>     
+</apex:page-->
+<apex:page id="Registration" showHeader="false" controller="AL_SiteRegisterController" title="{!$Label.site.register}">
+
+    <apex:define name="body">  
+      <center>
+        <apex:panelGrid bgcolor="white" columns="1"> 
+          <br/>
+          <br/>
+          <apex:panelGrid width="758" cellpadding="0" cellspacing="0" bgcolor="white" columns="1" styleClass="topPanelContainer"> 
+            <br/>
+            <apex:outputPanel layout="block" styleClass="topPanel">
+              <apex:panelGrid width="758" cellpadding="0" cellspacing="0" bgcolor="white" columns="2"> 
+
+                <apex:panelGroup >
+                  <br/>
+                  <apex:outputText styleClass="title" value="New User Registration" style="text-shadow: 2px 2px 5px rgb(195, 0, 255);font-family:'Trebuchet MS', Verdana, sans-serif;font-size: 13px;color:blueviolet;"/>
+                  <br/>
+                  <apex:form id="theForm" forceSSL="true">
+                    <apex:pageMessages id="error"/>
+                    <apex:panelGrid columns="2" style="margin-top:1em;">
+                      <apex:outputLabel value="First & Last Name" for="name"/>
+                      <apex:inputText id="name" value="{!name}"/>
+                      <apex:outputLabel value="Login Name" for="loginName"/>
+                      <apex:inputText required="true" id="loginName" value="{!loginName}"/>
+                      <apex:outputLabel value="Password" for="password"/>
+                      <apex:inputSecret required="true" id="password" value="{!password}"/>
+                    </apex:panelGrid>
+                    <apex:panelGrid columns="2" style="margin-top:1em;">
+                      <apex:outputPanel id="panel" style="margin-left: auto;">
+                          <apex:outputLabel value="Select Your State" for="states"/>
+                          <apex:selectList id="states" value="{!selectedState}" size="1" required="true" >
+                                    <apex:actionSupport event="onchange" reRender="panel" />
+                              <apex:selectOptions value="{!StateOptions}"/>
+                          </apex:selectList>
+                          <br/>
+                          <br/>                       
+                          <apex:outputLabel value="Select Your City" /> 
+                          <apex:selectList id="citiesOptions" value="{!selectedCity}" size="1" required="true">
+                              <apex:selectOptions value="{!CityOptions}"/>
+                          </apex:selectList>
+                      </apex:outputPanel>
+                      <br/>
+                      <apex:commandButton action="{!registerUser}" value="Submit" id="submit"/>
+                    </apex:panelGrid>
+                    </apex:form>                  
+                  <br/>
+                </apex:panelGroup>
+              </apex:panelGrid> 
+             </apex:outputPanel>
+          </apex:panelGrid> 
+       </apex:panelGrid>
+      </center>
+      <br/>
+    </apex:define>
 </apex:page>

@@ -1,84 +1,65 @@
-<apex:page controller="AL_EnterMeterReadingsController" showHeader="false" sidebar="false" id="thePage">
-    <h1 style="title"> 
-        Enter Meter Readings 
-    </h1>
-	<h2>
-        {!activePublicUser.pubUserName}
-    </h2>
-    <apex:pageMessages id="warning" />   
-    <!-- show this form when payment record for last month doesn't exist yet -->
-    <apex:form id="Form1">    
-        <apex:pageBlock rendered="{!ISNULL(payRec)}">
-             <apex:pageblockSection title="Enter Actual Meter Readings"  id="EnterDataSection" columns="1">
-              <apex:pageBlockSectionItem >
-                  Payment_Month__c: <apex:outputText value="{0,date,MMMM}">
-                  		<apex:param value="{!dynamicMonth}"  />
-                  </apex:outputText> 
-              </apex:pageBlockSectionItem>              
-              <apex:pageBlockSectionItem >
-                  Electricity Meter Readings (kWt): <apex:inputText required="true" value="{!electro}" id="electro"/>
-              </apex:pageBlockSectionItem>
-              <apex:pageBlockSectionItem >
-                  Gas Meter Readings (m3): <apex:inputText required="true" value="{!gas}" id="gas"/>
-              </apex:pageBlockSectionItem>
-              <apex:pageBlockSectionItem >
-                  Water Meter Readings (m3): <apex:inputText required="true" value="{!water}" id="water"/>
-              </apex:pageBlockSectionItem>
-        		<apex:commandButton id="submitMeterReadings" action="{!saveReadings}" value="Save Readings" style="background:#d699ff; padding: 5px 10px 5px 10px"/><!-- reRender="thePage" -->
-            </apex:pageblockSection>
-        </apex:pageBlock> 
-    </apex:form>       
-     <!-- end of Enter_Meter_Readings form -->
-    
-     <!-- show this form when payment record for last month has been already created -->
-    <apex:form id="Form2">   
-         <apex:pageBlock rendered="{!NOT(ISNULL(payRec))}">
-             <apex:pageblockSection title="Actual Meter Readings"  id="detailSection" columns="1" >
-              <apex:pageBlockSectionItem >
-                  Payment_Month__c: <apex:outputText value="{0,date,MMMM}">
-                  		<apex:param value="{!dynamicMonth}"  />
-                  </apex:outputText> 
-              </apex:pageBlockSectionItem>              
-              <apex:pageBlockSectionItem >
-                  Electricity Meter Readings (kWt): <apex:outputField value="{!payRec.Electricity_Meter_Readings__c}" />
-              </apex:pageBlockSectionItem>
-              <apex:pageBlockSectionItem >
-                  Gas Meter Readings (m3): <apex:outputField value="{!payRec.Gas_Meter_Readings__c}"/>
-              </apex:pageBlockSectionItem>
-              <apex:pageBlockSectionItem >
-                  Water Meter Readings (m3): <apex:outputField value="{!payRec.Water_Meter_Readings__c}"/>
-              </apex:pageBlockSectionItem>
-            </apex:pageblockSection>
-         </apex:pageBlock>
-    </apex:form>                   
-     <!-- end of Show_Meter_Readings form -->
-    <apex:form id="Form3">  
-        <apex:pageBlock rendered="{!NOT(ISNULL(payRec))}">
-             <apex:pageblockSection title="Payment Details"  id="PaymentSection" columns="1">          
-              <apex:pageBlockSectionItem >
-                  Payment_Fullness__c: 
-                  <apex:selectList id="Payment_Fullness" value="{!selectedPaymentType}" size="1" required="true">
-                  <apex:selectOptions value="{!options}"/>
-                  </apex:selectList>
-              </apex:pageBlockSectionItem>
-              <apex:pageBlockSectionItem >
-                  Recommended_Payment_Sum__c: <apex:outputField value="{!payRec.Recommended_Payment_Sum__c}"/>
-              </apex:pageBlockSectionItem>
-              <apex:pageBlockSectionItem >
-                  Remaining_Sum_for_Payment__c: <apex:outputField value="{!payRec.Remaining_Sum_for_Payment__c}"/>
-              </apex:pageBlockSectionItem>
-              <apex:pageBlockSectionItem >
-                  Sum_Already_Payed__c: <apex:outputField value="{!payRec.Sum_Already_Payed__c}"/>
-              </apex:pageBlockSectionItem>
-              <apex:outputText>If you desire to pay only part of recommended sum enter the sum in the below field and click Do Payment button.</apex:outputText>
-              <apex:pageBlockSectionItem >
-                    Enter your sum for partial payment: <apex:inputText value="{!customSum}" ></apex:inputText>
-              </apex:pageBlockSectionItem>
+<apex:page controller="AL_EnterMeterReadingsController" showHeader="false" sidebar="false">
+  <apex:form id="theForm">
+    <apex:pageBlock title="Enter Meter Readings">
+        <apex:pageMessages />
+        <!-- Show input fields section -->
+		<apex:outputPanel id="meter_section" rendered="{!ISNULL(existingMeters)}">
+             <apex:outputText value="Payment Month is {0,date,MMMM}" style="font-family:'Trebuchet MS', Verdana, sans-serif;font-size: 15px;color:blueviolet;">
+                <apex:param value="{!dynamicMonth}"  />
+            </apex:outputText> 
+            <apex:outputText value="" /><br/>
+    		<apex:inputField value="{! metersToInsert.Electricity_Meter_Readings__c }"/><br/>
+            <apex:inputField value="{! metersToInsert.Gas_Meter_Readings__c }" /><br/>
+    		<apex:inputField value="{! metersToInsert.Water_Meter_Readings__c }"/><br/>
+        </apex:outputPanel>
+        <!-- / Show input fields section -->
+        <!-- Show read-only fields section -->
+		<apex:outputPanel id="show_meter_readings_section" rendered="{!NOT(ISNULL(existingMeters))}">
+             <apex:outputText value="You have already entered meter readings for {0,date,MMMM}" style="font-family:'Trebuchet MS', Verdana, sans-serif;font-size: 15px;color:blueviolet;">
+                <apex:param value="{!dynamicMonth}"  />
+            </apex:outputText> 
+            <apex:outputText value="" /><br/>
+    		<apex:outputField value="{! existingMeters.Electricity_Meter_Readings__c }"/><br/>
+            <apex:outputField value="{! existingMeters.Gas_Meter_Readings__c }" /><br/>
+    		<apex:outputField value="{! existingMeters.Water_Meter_Readings__c }"/><br/>
+        </apex:outputPanel>
+        <!-- / Show read-only fields section -->
+        <apex:outputPanel >
+            <apex:commandButton action="{! submitNewMeter }" reRender="meter_table, theForm" value="Submit Meter Readings" disabled="{!NOT(ISNULL(existingMeters))}"/>
+            <!--apex:actionFunction name="reRenderTable"  /--> <!-- reRender="meter_table,show_meter_readings_section" -->
+<!-- 
+<apex:actionSupport event="onchange" action="{!getSelected}" rerender="timeline" oncomplete="reRenderMessages();"/>
+<apex:actionFunction name='reRenderMessages' reRender='messages'/> -->
+<!-- -->
 
-            <br/>
-            <apex:outputText>If you desire to pay recommended sum fully just click Do Payment button.</apex:outputText>
-          <apex:commandButton id="submitPayment" action="{!doPayment}" value="Do Payment" /><!-- reRender="detailSection" -->
-                  </apex:pageblockSection>
-              </apex:pageBlock>
-		</apex:form>
+        </apex:outputPanel>
+    </apex:pageBlock>
+
+  <apex:outputPanel title="List of Meter Readings" id="meter_table">
+      <apex:dataTable value="{! metersFromController }" var="meter" style="border: 1px solid black; width: 100%; margin:10px; padding: 10px; ">
+          <apex:column>
+            <apex:facet name="header">Payment Month</apex:facet>
+            <apex:outputText value="{! meter.Payment_Month__c }"/ >
+        </apex:column>
+        <apex:column>
+            <apex:facet name="header">Electricity</apex:facet>
+            <apex:outputText value="{! meter.Electricity_Meter_Readings__c }"/>
+        </apex:column>
+        <apex:column>
+            <apex:facet name="header">Gas</apex:facet>
+            <apex:outputText value="{! meter.Gas_Meter_Readings__c   }"/>
+        </apex:column>
+        <apex:column>
+            <apex:facet name="header">Water</apex:facet>
+            <apex:outputText value="{! meter.Water_Meter_Readings__c }"/>
+        </apex:column>
+      </apex:dataTable>
+      <apex:outputText value="" />
+      <apex:outputLink value="{!$Page.AL_DoPayment+'?id='+$CurrentPage.parameters.id}" styleClass="btn" 
+                        style="text-decoration:none;padding:4px;" disabled="{!ISNULL(existingMeters)}">
+                        Do Payment
+                    </apex:outputLink>
+      <apex:outputLink value="{!$Page.AL_UserHomePage+'?id='+$CurrentPage.parameters.id}" styleClass="btn" style="text-decoration:none;padding:4px;" >User Home Page</apex:outputLink>
+    </apex:outputPanel>
+</apex:form>
 </apex:page>

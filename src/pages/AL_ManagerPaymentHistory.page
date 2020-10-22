@@ -1,0 +1,67 @@
+<apex:page controller="AL_ManagerPaymentHistoryController" showHeader="false" sidebar="false" lightningStylesheets="true">
+    <apex:slds />
+    <!--ltng:require styles="/resource/SLDS_Library/assets/styles/salesforce-lightning-design-system-ltng.min.css" /-->
+    <apex:stylesheet value="{!URLFOR($Resource.SLDS_Library, 'assets/styles/salesforce-lightning-design-system-ltng.min.css')}"/>
+    <apex:form >
+        <apex:outputPanel title="List of Payments" id="payment_table">           
+            <!-- -->
+            <apex:dataTable value="{! paymentsFromController }" var="payment" style="border: 1px solid black; width: 100%; margin:10px; padding: 10px; ">
+                <apex:column>
+                  <apex:facet name="header">Click to update</apex:facet>
+                    <apex:commandLink value="{!payment.Name}" action="{!fetchDetail}"  >
+                        <apex:param assignTo="{!paymentId}" name="{!payment.Id}" value="{!payment.Id}"/>
+                    </apex:commandLink>   
+                    <apex:outputText value="{! payment.Name }"/ >
+                </apex:column>
+                <apex:column>
+                    <apex:facet name="header">User</apex:facet>
+                    <apex:outputText value="{! payment.Public_User__r.Name }"/ >
+                </apex:column>
+                <apex:column>
+                    <apex:facet name="header">Payment Month</apex:facet>
+                    <apex:outputText value="{! payment.Payment_Month__c }"/ >
+                </apex:column>
+                <apex:column>
+                    <apex:facet name="header">Sum Culculated for Payment</apex:facet>
+                    <apex:outputText value="{! payment.Recommended_Payment_Sum__c }"/>
+                </apex:column>
+                <apex:column>
+                    <apex:facet name="header">Sum Remaining to Pay</apex:facet>
+                    <apex:outputText value="{! payment.Remaining_Sum_for_Payment__c }"/>
+                </apex:column>
+                <apex:column>
+                    <apex:facet name="header">Sum Payed</apex:facet>
+                    <apex:outputText value="{! payment.Sum_Already_Payed__c }"/>
+                </apex:column>
+                <apex:column>
+                    <apex:facet name="header">Payment Status</apex:facet>
+                    <apex:outputText value="{! payment.Payment_Status__c }"/>
+                </apex:column>
+                <apex:column>
+                    <apex:facet name="header">Payment Date</apex:facet>
+                    <apex:outputText value="{! payment.Payment_Closed_Date__c }">
+                  		<!--apex:param value="{! payment.Payment_Closed_Date__c }"  /-->
+                    </apex:outputText> 
+                </apex:column>
+            </apex:dataTable>
+            <apex:outputText value="" />
+        </apex:outputPanel>
+
+            <apex:outputLink value="{!$Page.AL_ManagerHomePage+'?id='+$CurrentPage.parameters.id}" 
+                            styleClass="btn" style="text-decoration:none;padding:4px;" >Manager Home Page</apex:outputLink>
+
+                    <!-- -->
+                    <apex:outputText value="" /><br/>
+                    <apex:outputText value="" /><br/>
+        <apex:outputPanel rendered="{!NOT(ISNULL(recordToUpdate))}" id="PaymentToUpdate"> 
+                <apex:outputField value="{!recordToUpdate.Name}"/><br/>
+                <apex:outputField value="{!recordToUpdate.Payment_Month__c}"/><br/>
+                <apex:outputField value="{!recordToUpdate.Recommended_Payment_Sum__c }"/><br/>
+                <apex:outputField value="{!recordToUpdate.Remaining_Sum_for_Payment__c }"/><br/>
+                <apex:outputField value="{!recordToUpdate.Sum_Already_Payed__c }"/><br/>
+                <apex:inputText value="{!paymentAdjustment }"/><br/>
+                <apex:inputField value="{!recordToUpdate.Payment_Status__c }"/><br/>
+                <apex:commandButton id="submitUpdate" action="{!doUpdate}" value="Submit Update" />
+        </apex:outputPanel>
+    </apex:form>
+</apex:page>

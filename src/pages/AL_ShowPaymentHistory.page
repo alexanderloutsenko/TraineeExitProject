@@ -1,17 +1,23 @@
-<apex:page standardController="Monthly_Payment__c" recordSetVar="records" showHeader="false" sidebar="false">
-  <apex:form >
-      <apex:pageBlock >
-          <apex:pageblockSection title="My Payments History" >
-              <apex:pageblockTable value="{!records}" var="rec" rows="10">
-                  <apex:column headerValue="Payment Month" value="{! rec.Payment_Month__c}"/>
-                  <apex:column headerValue="Electro" value="{!rec.Electricity_Meter_Readings__c}"/>
-                  <apex:column headerValue="Gas" value="{!rec.Gas_Meter_Readings__c}"/>
-                  <apex:column headerValue="Water" value="{!rec.Water_Meter_Readings__c}"/>
-                  <apex:column headerValue="Payment_Closed_Date" value="{!rec.Payment_Closed_Date__c}"/>
-                  <apex:column headerValue="Sum Already Payed " value="{!rec.Sum_Already_Payed__c }"/>
-                  <apex:column headerValue="Sum Remaining to Pay" value="{!rec.Remaining_Sum_for_Payment__c}"/>                                                      
-              </apex:pageblockTable>
-      </apex:pageblockSection>
-    </apex:pageBlock >
-  </apex:form>  
+<apex:page controller="AL_ShowPaymentHistoryContoller" showHeader="false" sidebar="false">
+
+    <apex:pageBlock title="List of Meter Readings" id="meter_table">
+      <apex:pageBlockTable value="{! payRecsByUser }" var="meter" >
+          <apex:column value="{! meter.Payment_Month__c }"/>
+          <apex:column value="{! meter.Electricity_Meter_Readings__c }"/>
+          <apex:column value="{! meter.Gas_Meter_Readings__c  }"/>
+          <apex:column value="{! meter.Water_Meter_Readings__c }"/>
+          <apex:column value="{! meter.Payment_Closed_Date__c  }"/>
+          <apex:column value="{! meter.Sum_Already_Payed__c  }"/>
+          <apex:column value="{! meter.Payment_Status__c  }"/>
+          <apex:column value="{! meter.Region__c  }"/>         
+      </apex:pageBlockTable>
+      <apex:outputText value="" />
+      <apex:outputLink value="{!$Page.AL_DoPayment+'?id='+$CurrentPage.parameters.id}" styleClass="btn" 
+                        style="text-decoration:none;padding:4px;">
+                        Do Payment
+                    </apex:outputLink>
+      <apex:outputLink value="{!$Page.AL_UserHomePage+'?id='+$CurrentPage.parameters.id}" styleClass="btn" 
+                        style="text-decoration:none;padding:4px;" >User Home Page</apex:outputLink>
+    </apex:pageBlock>
+ 
 </apex:page>

@@ -1,11 +1,10 @@
-<apex:page>
-  <!--apex:composition template="{!$Site.Template}"-->
+<apex:page showHeader="false" sidebar="false">
     <apex:define name="body">  
       <center>
         <apex:panelGrid bgcolor="white" columns="1" style="align: center;"> 
           <br/>
           <br/>
-          <apex:panelGrid width="758" cellpadding="0" cellspacing="0" bgcolor="white" columns="1" style="topPanel"> 
+          <apex:panelGrid width="758" cellpadding="0" cellspacing="0" bgcolor="lightblue" columns="1" style="topPanel"> 
             <br/>
             <apex:outputPanel layout="block" styleClass="topPanelContainer">
               <apex:panelGrid width="758" cellpadding="0" cellspacing="0" bgcolor="white" columns="2"> 
@@ -15,16 +14,14 @@
                   <apex:outputText styleClass="title" value="Thank you for your logging in like a manager"/>
                   <br/>
                   <br/>
-                  <apex:outputLink value="{!$Page.AL_SiteLogin}" rendered="{!$Site.LoginEnabled}">{!$Label.site.go_to_login_page}</apex:outputLink>
+                  <apex:outputLink value="{!$Page.AL_ManagerPaymentHistory+'?id='+$CurrentPage.parameters.id}" > View payments history for your region </apex:outputLink>
                   <br/>
                 </apex:panelGroup>
               </apex:panelGrid> 
             </apex:outputPanel>
-            <!--c:SitePoweredBy /-->
           </apex:panelGrid> 
        </apex:panelGrid>
       </center>
       <br/>
     </apex:define>
-  <!--/apex:composition-->
 </apex:page>

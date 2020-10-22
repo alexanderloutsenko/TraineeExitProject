@@ -1,213 +1,80 @@
 public class AL_EnterMeterReadingsController {
+
+    public Monthly_Payment__c metersToInsert {get; set;}
+    public Monthly_Payment__c existingMeters {get; set;}
     public static Datetime dynamicMonth { get { return Datetime.now().addMonths(-1); } }
-    //public string pageRef = System.currentPageReference().getURL();
-    public WrapPublicUserData activePublicUser { get; set; }
-    String publicUserId ;
-    public Monthly_Payment__c payRec { get; set; }
-    public String selectedPaymentType { get; set; }
-    public Integer electro { get; set; }
-    public Integer gas { get; set; }
-    public Integer water { get; set; }
-    public Decimal customSum { get; set; }
-    public String noPaymentYet = 'You don\'t have payment record generated for last month yet';
-     
-    public AL_EnterMeterReadingsController() {
-        // get public user id from URL       
-        publicUserId = System.CurrentPageReference().getParameters().get('id');
-        // get user data + user's region
-        activePublicUser = new WrapPublicUserData([SELECT id, Name, Region__c 
-                              						 FROM Public_User__c 
-                             						WHERE id = :publicUserId]);
-        // check whether the user already has a payment for last month
-        getPaymentData();
-        /*List<Monthly_Payment__c> payRecsByUser = [
-            	  SELECT Id,
-                         Electricity_Meter_Readings__c,
-                  		 Gas_Meter_Readings__c,
-                  		 Water_Meter_Readings__c,
-                  		 Payment_Closed_Date__c,
-                  		 Payment_Month__c,
-                  		 Payment_Fullness__c,
-                  		 Payment_Status__c,
-                  	     Public_User__c,
-                  		 Rates__c,
-                  		 Region__c,
-                  		 Recommended_Payment_Sum__c,
-                         Remaining_Sum_for_Payment__c,
-						 Sum_Already_Payed__c                  		 
-                 	FROM Monthly_Payment__c
-                   WHERE Public_User__c = :publicUserId
-                     AND Payment_Month__c = :dynamicMonth.format('MMMM')];
-        
-        if(payRecsByUser.size() == 0) {
-           noPaymentYet(); // if no payment exists show warning and input fields for inputing meter readings                   
-        } else {
-           payRec = payRecsByUser[0]; // if payment already exists show meter readings in read-only mode
-        }*/
-    }
-
-    public void getPaymentData() {
-        // check whether the user already has a payment for last month
-        List<Monthly_Payment__c> payRecsByUser = [
-            	  SELECT Id,
-                         Electricity_Meter_Readings__c,
-                  		 Gas_Meter_Readings__c,
-                  		 Water_Meter_Readings__c,
-                  		 Payment_Closed_Date__c,
-                  		 Payment_Month__c,
-                  		 Payment_Fullness__c,
-                  		 Payment_Status__c,
-                  	     Public_User__c,
-                  		 Rates__c,
-                  		 Region__c,
-                  		 Recommended_Payment_Sum__c,
-                         Remaining_Sum_for_Payment__c,
-						 Sum_Already_Payed__c                  		 
-                 	FROM Monthly_Payment__c
-                   WHERE Public_User__c = :publicUserId
-                     AND Payment_Month__c = :dynamicMonth.format('MMMM')];
-        
-        if(payRecsByUser.size() == 0) {
-           noPaymentYet(); // if no payment exists show warning and input fields for inputing meter readings                   
-        } else {
-           payRec = payRecsByUser[0]; // if payment already exists show meter readings in read-only mode
-        }
-    }
-    // check whether the payment record for last month already exists
-    public PageReference noPaymentYet() {
-        ApexPages.addMessage(new ApexPages.message(ApexPages.severity.WARNING,noPaymentYet));
-        return null;
-    }
-    // Payment_Fullness__c picklist population
-    public List<SelectOption> getOptions() {
-        List<SelectOption> payOptions = new List<SelectOption>();        
-        Schema.DescribeFieldResult fieldResult = Monthly_Payment__c.Payment_Fullness__c.getDescribe();
-        List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
-        
-        for(Schema.PicklistEntry f : ple) {
-            payOptions.add(new SelectOption(f.getLabel(), f.getValue()));
-        }       
-        return payOptions;
-    }
-
-    public PageReference saveReadings() {
-        Monthly_Payment__c dataToSubmit = new Monthly_Payment__c();
-        dataToSubmit.Electricity_Meter_Readings__c = electro;
-        dataToSubmit.Gas_Meter_Readings__c         = gas;
-        dataToSubmit.Water_Meter_Readings__c       = water;        
-        dataToSubmit.Payment_Month__c              = dynamicMonth.format('MMMM');
-        dataToSubmit.Public_User__c 			   = activePublicUser.pubUserId;
-        dataToSubmit.Region__c 					   = activePublicUser.regionId;
-        dataToSubmit.Rates__c					   = activePublicUser.rateId;
-
-        System.debug(dataToSubmit);
-        // insert new payment with only meter readings 
-        // and the data helping with future calculations populated
-        insert dataToSubmit;
-        // refresh current page
-        return new PageReference('/AL_EnterMeterReadings?id='+activePublicUser.pubUserId);
-        //return null;    
-    }
-
-    public void checkPaymentFullness(Decimal mustPay, Decimal wantPay) {
-        // check whether this is additional payment for current Payment record
-        System.debug('**befor IFs in checkPaymentFullness() -- mustPay='+mustPay+', wantPay='+wantPay+', payRec.Sum_Already_Payed__c='+payRec.Sum_Already_Payed__c);
-        if(payRec.Sum_Already_Payed__c == 0 || payRec.Sum_Already_Payed__c == null ) { // first time payment
-            if(mustPay > wantPay && wantPay != 0) {
-                selectedPaymentType = 'Partially';
-                //System.debug('(1) if(mustPay > wantPay && wantPay != 0) = '+selectedPaymentType);                  
-            } else {
-                selectedPaymentType = 'Fully';
-                customSum = payRec.Recommended_Payment_Sum__c;             
-                //System.debug('(2) ELSE (mustPay <= wantPay) || wantPay == 0) = '+selectedPaymentType);  
-            } 
-        } else {
-            if(mustPay > wantPay+payRec.Sum_Already_Payed__c && wantPay != 0) { // additional payment
-                selectedPaymentType = 'Partially';
-                //System.debug('(1) if(mustPay > wantPay && wantPay != 0) = '+selectedPaymentType);                  
-            } else {
-                selectedPaymentType = 'Fully';      
-                //System.debug('(2) ELSE (mustPay <= wantPay) || wantPay == 0) = '+selectedPaymentType);  
-            } 
-            customSum = customSum + payRec.Sum_Already_Payed__c; 
-            System.debug ('** customSum in ELSE for if(payRec.Sum_Already_Payed__c == 0) is '+customSum);                 
-        }
-    }
+    public static String userId = System.CurrentPageReference().getParameters().get('id');
+    public Public_User__c currentUser ;
+    public Boolean paymentExists { get; set; }
+    public static Integer count = 0;
     
-    public PageReference showMessage() {
-        ApexPages.addMessage(new ApexPages.message(ApexPages.severity.WARNING,'Enter sum no less then 20$'));
-        return null;        
+    public AL_EnterMeterReadingsController () {
+        currentUser = [SELECT id, 
+                            Name, 
+                            Region__c 
+                        FROM Public_User__c 
+                        WHERE id = :userId];
+
+        //Check whether payment for last month already exists
+        checkPaymentExist();
     }
 
-    public PageReference doPayment() {
-        //first, perform REST Api with payment
-        /** here will be the code to perform REST Api with payment 
-        */
-
-        //second, form Payment record to fulfill it with payment data     
-        checkPaymentFullness(payRec.Recommended_Payment_Sum__c, customSum);
-    
-        Monthly_Payment__c payRecToUpdate = new Monthly_Payment__c();
-        payRecToUpdate.Id = payRec.Id;
-        if(selectedPaymentType == 'Partially') {
-            payRecToUpdate.Payment_Status__c = 'Partial';// consider to get rid of this field by removing it from the object
+    public void checkPaymentExist () {
+            List<Monthly_Payment__c> payRecsByUser = [
+                 SELECT Id,
+                        Electricity_Meter_Readings__c,
+                        Gas_Meter_Readings__c,
+                        Water_Meter_Readings__c,
+                        Payment_Closed_Date__c,
+                        Payment_Month__c              		 
+                   FROM Monthly_Payment__c
+                  WHERE Public_User__c = :userId
+                    AND Payment_Month__c = :dynamicMonth.format('MMMM')];
+      
+        if(payRecsByUser.size() > 0) {
+            existingMeters = payRecsByUser[0]; // if payment already exists show meter readings in read-only mode
+            System.debug('** exists meters = '+existingMeters);
+            count++;
+            System.debug('** count='+count);
+            //paymentExists = true;
         } else {
-            payRecToUpdate.Payment_Status__c = 'Closed';// consider to get rid of this field by removing it the object
-            payRecToUpdate.Payment_Closed_Date__c = Datetime.now();
+            //initialize the object to avoid NullPointerException on Payment creation
+            metersToInsert = new Monthly_Payment__c();
         }
-        payRecToUpdate.Payment_Fullness__c = selectedPaymentType;
-        payRecToUpdate.Sum_Already_Payed__c = customSum;       		 
-        System.debug('** '+payRecToUpdate);  
-        //update Monthly_Payment__c record with payment data
-        try{
-            update payRecToUpdate;
-        }
-        catch(DmlException ex){
-            ApexPages.addMessages(ex);
-        }
-
-        ApexPages.addMessage(new ApexPages.message(ApexPages.severity.WARNING,'Your payment is successfull'));
-        return new PageReference('/AL_UserHomePage?id='+activePublicUser.pubUserId);
-        //getPaymentData();
-        //return null;
     }
-    
-        //  wrapper class
-    public class WrapPublicUserData {    
-    //public Public_User__c pubUser {get;set;}
-    public String pubUserName {get;set;}
-    public Id pubUserId {get;set;} 
-    public Id regionId {get;set;}
-    public String paymentMonth {get;set;}
-    public Id rateId {get;set;}        
-    public Id stndRdngsId {get;set;}
-    
-     
-    	public WrapPublicUserData (Public_User__c u){     
-            pubUserName = u.Name;
-            pubUserId = u.Id;
-            regionId = u.Region__c;
-            paymentMonth = dynamicMonth.format('MMMM');
+      
+        public PageReference submitNewMeter () {
+            metersToInsert.Payment_Month__c = dynamicMonth.format('MMMM');
+            metersToInsert.Region__c = currentUser.Region__c;
+            metersToInsert.Public_User__c = userId;
             List<Rates__c> rates = [
-                     SELECT Electricity_Rate__c, Gas_Rate__c, Water_Rate__c, Region__r.Id
-					   FROM Rates__c
-					  WHERE Region__c =: regionId
-                       LIMIT 1];
+                SELECT Electricity_Rate__c, Gas_Rate__c, Water_Rate__c, Region__r.Id
+                  FROM Rates__c
+                 WHERE Region__c =: currentUser.Region__c
+                  LIMIT 1];
             if(rates.size() > 0) {
-                rateId = rates[0].Id;
+                metersToInsert.Rates__c = rates[0].Id;
             }
+            //insert new record
+            insert metersToInsert;
+            // nullify the object to clean up the fields on Create Payment section on the VF page
+            //metersToInsert = new Monthly_Payment__c();
+            checkPaymentExist();
+            return new Pagereference ('/AL_EnterMeterReadings?id='+userId);
+            //return null;
+        }
+        
+        public List<Monthly_Payment__c> getMetersFromController () { //getContsFromController
+            List<Monthly_Payment__c> metersList = [SELECT 
+                                        Payment_Month__c , 
+                                        Electricity_Meter_Readings__c,
+                                        Gas_Meter_Readings__c ,
+                                        Water_Meter_Readings__c
+                                        FROM Monthly_Payment__c 
+                                        WHERE Public_User__r.Id =: userId 
+                                        ORDER BY CreatedDate DESC
+                                        LIMIT 5];
+            return metersList;
+        }
 
-            List<Standard_Readings__c> stndRdngs = [
-                		 SELECT Electricity_Standard_Readings__c,
-                         		Gas_Standard_Readings__c,
-                         		Water_Standard_Readings__c
-                		   FROM Standard_Readings__c
-                          WHERE Region__c =: regionId
-            			  LIMIT 1];
-            if(stndRdngs.size() > 0) {
-                stndRdngsId = stndRdngs[0].Id;
-            }
-
-       	}
-  	}    
 }

@@ -6,21 +6,17 @@ global class AL_SiteRegisterController {
     public Id selectedRegion {get; set;}
     public String selectedState {get; set;}
     public String selectedCity {get; set;}
- 
+    //public List<SelectOption> stateOptions {get; set;}
+    //public List<SelectOption> cityOptions {get; set;}
+    
+    
     //public List<SelectOption> cityOptions = new List<SelectOption>(); 
     global String password {get; set {password = value == null ? value : value.trim(); } }
     global String userAlreadyExistsMsg = 'Login name you are trying to submit already in use by another user';
 
-    global AL_SiteRegisterController () { }
-
-    public List<SelectOption> getOptions() {
-        List<SelectOption> regionOptions = new List<SelectOption>();
-        regions = [select Id, Name from Region__c order by Name limit 100];
-        for(Region__c r : regions)
-        {
-            regionOptions.add(new SelectOption(r.Id, r.Name));
-        }       
-        return regionOptions; 
+    global AL_SiteRegisterController () { 
+        //getStateOptions();
+        //getCityOptions (); 
     }
 
   public List<SelectOption> getStateOptions()
@@ -39,7 +35,7 @@ global class AL_SiteRegisterController {
 
     public List<SelectOption> getCityOptions() 
   {
-         List<SelectOption> cityOptions = new List<SelectOption>();
+        List<SelectOption> cityOptions = new List<SelectOption>(); 
         Schema.DescribeFieldResult fieldResult = Region__c.City__c.getDescribe();
         cityOptions.add(new SelectOption('-- None --', '-- None --'));
         if(selectedState == 'CA') {
@@ -54,7 +50,7 @@ global class AL_SiteRegisterController {
                  cityOptions.add(new SelectOption('Pavlograd', 'Pavlograd'));
                  cityOptions.add(new SelectOption('Piatikhatkyy', 'Piatikhatkyy')); 
         }         
-        return cityOptions;
+        return cityOptions ;
   }
 
     public Boolean checkUser() {
@@ -95,9 +91,6 @@ global class AL_SiteRegisterController {
             newUser.Name          = name == null ? loginName : name;
             newUser.Region__c     = regionId;
             
-            System.debug(' ** selectedState = '+selectedState+' and selectedCity='+selectedCity+' and loginName='+loginName);
-            System.debug('** newUser='+newUser);
-            System.debug('** newUser.Region__c='+newUser.Region__c);
             insert newUser; 
             return new PageReference('/AL_SiteRegisterConfirm');
 
@@ -106,9 +99,9 @@ global class AL_SiteRegisterController {
                 // show error message if login name already exists
                 ApexPages.addMessage(new ApexPages.message(ApexPages.severity.WARNING,userAlreadyExistsMsg));
             }
-            if(String.isBlank(regionId)) {
+            if(String.isBlank(regionId) || String.isBlank(loginName) || String.isBlank(loginName) || selectedState == '-- None --' || selectedCity == '-- None --') {
                 // show error message if either state or city is not selected
-                ApexPages.addMessage(new ApexPages.message(ApexPages.severity.WARNING,'Select both State and City'));
+                ApexPages.addMessage(new ApexPages.message(ApexPages.severity.WARNING,'Populate all fields for successfull registration'));
             }
             return null;
         }

@@ -1,4 +1,4 @@
-<apex:page id="loginPage" controller="AL_SiteLoginController" showHeader="false" title="site_login">
+<apex:page id="loginPage" controller="AL_SiteLoginController" showHeader="false" title="site_login" >
     <apex:define name="body">  
       <center>
         <apex:panelGrid bgcolor="white" columns="1"> 
@@ -10,15 +10,14 @@
               <apex:panelGrid width="758" cellpadding="0" cellspacing="0" bgcolor="white" columns="2"> 
                  <apex:panelGroup >
                   <br/>
-                  <apex:outputText styleClass="title" value="Communal Services Login Page"/>
+                  <apex:outputText styleClass="title" value="Communal Services Login Page" style="text-shadow: 2px 2px 5px rgb(195, 0, 255);font-family:'Trebuchet MS', Verdana, sans-serif;font-size: 13px;color:blueviolet;"/>
                   <br/>
                   <apex:pageMessages id="error"/>                  
                   <apex:form id="siteLogin" > 
                     <apex:outputPanel layout="block">
-                      <!--apex:pageMessages id="error"/-->
-                      <apex:panelGrid columns="2" style="margin-top:1em;">
-                        <apex:outputLabel value="Login Name:" for="username"/>
-                        <apex:inputText id="username" value="{!username}"/>
+                      <apex:panelGrid columns="2" style="margin-top:1em;" >
+                        <apex:outputLabel value="Login Name:" for="username" style="margin-left: auto;"/>
+                        <apex:inputText id="username" value="{!username}"  style="margin-right: auto;"/>
                         <apex:outputLabel value="Password:" for="password"/>
                         <apex:inputSecret id="password" value="{!password}"/>
                         <apex:outputText value=""/>
