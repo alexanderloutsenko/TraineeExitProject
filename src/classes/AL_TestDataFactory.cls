@@ -1,3 +1,4 @@
+@isTest
 public with sharing class AL_TestDataFactory {
     public static String regionId;
     public static String ratesId;

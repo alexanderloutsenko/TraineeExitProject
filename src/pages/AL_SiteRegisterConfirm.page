@@ -9,7 +9,7 @@
             <br/>
             <apex:outputPanel layout="block" styleClass="topPanelContainer">
               <apex:panelGrid width="758" cellpadding="0" cellspacing="0" bgcolor="white" columns="2"> 
-                <!--apex:image url="{!URLFOR($Resource.SiteSamples, 'img/clock.png')}"/-->
+
                 <apex:panelGroup >
                   <br/>
                   <apex:outputText styleClass="title" value="Thank you for registering."/>
@@ -22,7 +22,7 @@
                 </apex:panelGroup>
               </apex:panelGrid> 
             </apex:outputPanel>
-            <!--c:SitePoweredBy /-->
+
           </apex:panelGrid> 
        </apex:panelGrid>
       </center>
