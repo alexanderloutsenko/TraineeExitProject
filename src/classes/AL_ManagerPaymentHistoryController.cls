@@ -5,7 +5,8 @@ public class AL_ManagerPaymentHistoryController {
     public Monthly_Payment__c recordToUpdate {get; set;}
     public String userId {get; set;}
     public Public_User__c manager {get; set;}
-    public Integer paymentAdjustment {get; set;}
+    public Decimal paymentAdjustment {get; set;}
+    public boolean fullyPaid {get; set;}
     
     public AL_ManagerPaymentHistoryController() {
         // get user Id
@@ -13,7 +14,8 @@ public class AL_ManagerPaymentHistoryController {
         // get user data
         manager = [SELECT Id,
                           Name,
-                          Region__c
+                          Region__c,
+                          Region__r.Name
                      FROM Public_User__c
                      WHERE Id =: userId];
         // grab list of payments for current user based on the user's region
@@ -36,6 +38,7 @@ public class AL_ManagerPaymentHistoryController {
 
     public PageReference fetchDetail () {
         // get record to update
+        System.debug('** paymentId sent to fetchDetail method and paymentId is '+paymentId);  
         if (paymentId != null){
             recordToUpdate = [SELECT Id, Name,
                                      Payment_Closed_Date__c,
@@ -47,11 +50,14 @@ public class AL_ManagerPaymentHistoryController {
                                      //Region__c,
                                      Recommended_Payment_Sum__c,
                                      Remaining_Sum_for_Payment__c,
-                                     Sum_Already_Payed__c                  		 
+                                     Sum_Already_Payed__c        		 
                                 FROM Monthly_Payment__c
                                 WHERE Id =: paymentId];
         }  
-        paymentAdjustment = 0;
+        paymentAdjustment = recordToUpdate.Remaining_Sum_for_Payment__c;
+        if(recordToUpdate.Payment_Closed_Date__c != null) {
+            fullyPaid = true;
+        }
         System.debug('** recordToUpdate = '+recordToUpdate);         
         //PageReference pageRef = new PageReference('/AL_ManagerPaymentHistory?id='+userId);
         //return pageRef;
@@ -60,11 +66,25 @@ public class AL_ManagerPaymentHistoryController {
 
     public PageReference doUpdate () {
         // form data to update the record with
-
-        // do DML call
-
-        //nullify recordToUpdate
-
+        if (paymentAdjustment == recordToUpdate.Remaining_Sum_for_Payment__c) {
+            // close payment
+            recordToUpdate.Payment_Fullness__c = 'Fully';
+            recordToUpdate.Payment_Status__c = 'Closed';
+            recordToUpdate.Payment_Closed_Date__c = System.today();
+            update recordToUpdate;
+            recordToUpdate = null;
+        } 
+        if (paymentAdjustment < recordToUpdate.Remaining_Sum_for_Payment__c && paymentAdjustment != 0 && paymentAdjustment != null) {
+            // update payment without closing
+            recordToUpdate.Sum_Already_Payed__c = recordToUpdate.Sum_Already_Payed__c + paymentAdjustment;
+            recordToUpdate.Payment_Status__c = 'Partial';
+            update recordToUpdate;
+            recordToUpdate = null;
+        } 
+        if (paymentAdjustment > recordToUpdate.Remaining_Sum_for_Payment__c) {
+            // show warning
+            ApexPages.addMessage(new ApexPages.message(ApexPages.severity.WARNING,'Please enter a sum which is less than the sum remaining for payment'));
+        }
         return null;
     }
 }

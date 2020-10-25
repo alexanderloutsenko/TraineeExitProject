@@ -1,4 +1,4 @@
-<apex:page showHeader="false" sidebar="false">
+<apex:page showHeader="false" sidebar="false" controller="AL_UserHomePageController">
     <apex:define name="body">  
       <center>
         <apex:panelGrid bgcolor="white" columns="1" style="align: center;"> 
@@ -8,10 +8,14 @@
             <br/>
             <apex:outputPanel layout="block" styleClass="topPanelContainer">
               <apex:panelGrid width="758" cellpadding="0" cellspacing="0" bgcolor="white" columns="2"> 
-                <!--apex:image url="{!URLFOR($Resource.SiteSamples, 'img/clock.png')}"/-->
                 <apex:panelGroup >
+                  <apex:outputText styleClass="title" value="Communal Services Manager's App" style="text-shadow: 2px 2px 5px rgb(195, 0, 255);font-family:'Trebuchet MS', Verdana, sans-serif;font-size: 15px;color:blueviolet;"/>
                   <br/>
-                  <apex:outputText styleClass="title" value="Thank you for your logging in like a manager"/>
+                  <br/>
+                  <br/>
+                  <apex:outputText value="Hi {!pageUser.Name}!" style="font-size: 120%" /><br/><br/>
+                  <apex:outputText value="You've just loged in like a manager and the region under your supervision is {!pageUser.Region__r.Name}." style="font-size: 120%" /><br/><br/>
+                  <apex:outputText value="From this page you can view your region's payment history and update your region's rates." style="font-size: 120%"/>
                   <br/>
                   <br/>
                   <br/>

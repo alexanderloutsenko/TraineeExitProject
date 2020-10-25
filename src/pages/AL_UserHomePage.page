@@ -1,16 +1,41 @@
-<apex:page controller="AL_UserHomePageController" showHeader="false" sidebar="false"> 
-<h1>Hi user! </h1>
-<apex:form >
-      <apex:pageBlock >
-          <apex:outputText >Hi, you can enter your meter readings for last month, perform the payment and view your payment history from this page</apex:outputText><br/>
-          <apex:pageBlockButtons >              
-              <apex:outputLink value="{!$Page.AL_EnterMeterReadings+'?id='+$CurrentPage.parameters.id}" styleClass="btn" style="text-decoration:none;padding:4px;" >Enter Meter Readings
-              </apex:outputLink>      
-              <apex:outputLink value="{!$Page.AL_ShowPaymentHistory+'?id='+$CurrentPage.parameters.id}" styleClass="btn" style="text-decoration:none;padding:4px;" >View Payment History
-              </apex:outputLink>
-              <!--apex:outputLink value="{!$Page.AL_ChangeResidence+'?id='+$CurrentPage.parameters.id}" styleClass="btn" style="text-decoration:none;padding:4px;" >Change Region Details
+<apex:page showHeader="false" sidebar="false" controller="AL_UserHomePageController">
+    <apex:define name="body">  
+      <center>
+        <apex:panelGrid bgcolor="white" columns="1" style="align: center;"> 
+          <br/>
+          <br/>
+          <apex:panelGrid width="500" cellpadding="0" cellspacing="0" bgcolor="lightblue" columns="1" style="topPanel"> 
+            <br/>
+            <apex:outputPanel layout="block" styleClass="topPanelContainer">
+              <apex:panelGrid width="758" cellpadding="0" cellspacing="0" bgcolor="white" columns="2"> 
+                <apex:panelGroup >
+                  <apex:outputText styleClass="title" value="Communal Services App" style="text-shadow: 2px 2px 5px rgb(195, 0, 255);font-family:'Trebuchet MS', Verdana, sans-serif;font-size: 15px;color:blueviolet;"/>
+                  <br/>
+                  <br/>
+                  <br/>
+                  <apex:outputText value="Hi {!pageUser.Name}!" style="font-size: 120%" /><br/><br/>
+                  <apex:outputText value="You can enter your meter readings for last month, perform the payment and view your payment history from this page." style="font-size: 120%" />
+                  <br/>
+                  <br/>
+                  <br/>
+                  <br/>
+                  <apex:outputLink value="{!$Page.AL_EnterMeterReadings+'?id='+$CurrentPage.parameters.id}" > Enter Meter Readings for {!month} </apex:outputLink>
+                  <br/>
+                  <br/>
+                  <apex:outputLink value="{!$Page.AL_ShowPaymentHistory+'?id='+$CurrentPage.parameters.id}" > View your Payment History </apex:outputLink>
+                  <br/>
+                  <br/>
+                  <apex:outputLink value="{!$Page.AL_SendEmail+'?id='+$CurrentPage.parameters.id}" > Send Email to Manager </apex:outputLink>
+                  <br/>
+                  <br/>
+                  <!--apex:outputLink value="{!$Page.AL_ChangeResidence+'?id='+$CurrentPage.parameters.id}" styleClass="btn" style="text-decoration:none;padding:4px;" >Change Region Details
               </apex:outputLink-->
-           </apex:pageBlockButtons>
-    </apex:pageBlock>
-    </apex:form>
+                </apex:panelGroup>
+              </apex:panelGrid> 
+            </apex:outputPanel>
+          </apex:panelGrid> 
+       </apex:panelGrid>
+      </center>
+      <br/>
+    </apex:define>
 </apex:page>

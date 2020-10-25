@@ -1,44 +1,31 @@
-<!--apex:page id="Registration_Page" showHeader="false" controller="AL_SiteRegisterController" title="Register">
-  <apex:pageMessages />
-    <apex:form id="RegistrationForm" forceSSL="true">
- 
-      <center>
-           <br/>
-                  <br/>
-                  <apex:outputText styleClass="title" value="New User Registration"/>
-                  <br/>
-                  <br/>
-
-                      <apex:outputLabel value="First & Last Name" for="name"/>
-                      <apex:inputText id="name" value="{!name}"/>
-                      <br/>
-                      <apex:outputLabel value="Login Name" for="loginName"/>
-                      <apex:inputText required="true" id="loginName" value="{!loginName}"/>
-                      <br/>
-                      <apex:outputLabel value="Password" for="password"/>
-                      <apex:inputSecret required="true" id="password" value="{!password}"/>
-                      <br/>
-                       <apex:outputLabel value="Select Your State" for="states"/> 
-                       <apex:outputPanel id="panel">
-                       <apex:selectList id="states" value="{!selectedState}" size="1" required="true" >
-                                 <apex:actionSupport event="onchange" reRender="panel" />
-                           <apex:selectOptions value="{!StateOptions}"/>
-                       </apex:selectList>
-                       <br/>
-                       <apex:outputLabel value="Select Your City" /> 
-                       <apex:selectList id="citiesOptions" value="{!selectedCity}" size="1" required="true">
-                           <apex:selectOptions value="{!CityOptions}"/>
-                       </apex:selectList>
-                      </apex:outputPanel>
-                       <br/> 
-
-                        <apex:commandButton action="{!registerUser}" value="Submit" id="submit"/> <p />                    
-      </center>
-      <br/>
-  </apex:form>     
-</apex:page-->
 <apex:page id="Registration" showHeader="false" controller="AL_SiteRegisterController" title="{!$Label.site.register}">
+<style>
 
+.grid {
+  display: grid;
+  grid-template-columns: 100px 100px 100px;
+}
+
+.container {
+  width: 200px;
+  height: 50px;
+  //border: 5px solid rgb(111,41,97);
+  border-radius: .5em;
+  padding: 10px;
+  justify-content: space-between;
+  align-content: space-between;
+}
+
+.item {
+  padding: 1% 0;
+  //background-color: rgba(111,41,97,.3);
+  border: 2px solid rgba(111,41,97,.5);
+}
+
+.label {
+  padding: 10% 0;
+}
+</style>
     <apex:define name="body">  
       <center>
         <apex:panelGrid bgcolor="white" columns="1"> 
@@ -51,7 +38,7 @@
 
                 <apex:panelGroup >
                   <br/>
-                  <apex:outputText styleClass="title" value="New User Registration" style="text-shadow: 2px 2px 5px rgb(195, 0, 255);font-family:'Trebuchet MS', Verdana, sans-serif;font-size: 13px;color:blueviolet;"/>
+                  <apex:outputText styleClass="title" value="New User Registration" style="text-shadow: 2px 2px 5px rgb(195, 0, 255);font-family:'Trebuchet MS', Verdana, sans-serif;font-size: 15px;color:blueviolet;"/>
                   <br/>
                   <apex:form id="theForm" forceSSL="true">
                     <apex:pageMessages id="error"/>
@@ -64,16 +51,16 @@
                       <apex:inputSecret required="true" id="password" value="{!password}"/>
                     </apex:panelGrid>
                     <apex:panelGrid columns="2" style="margin-top:1em;">
-                      <apex:outputPanel id="panel" style="margin-left: auto;">
-                          <apex:outputLabel value="Select Your State" for="states"/>
-                          <apex:selectList id="states" value="{!selectedState}" size="1" required="true" >
+                      <apex:outputPanel id="panel" styleClass="container grid">
+                          <apex:outputLabel value="Select Your State" for="states" styleClass="label"/> <!--style="margin-right: auto;" -->
+                          <apex:selectList id="states" value="{!selectedState}" size="1" required="true" styleClass="item">
                                     <apex:actionSupport event="onchange" reRender="panel" />
                               <apex:selectOptions value="{!StateOptions}"/>
                           </apex:selectList>
                           <br/>
                           <br/>                       
-                          <apex:outputLabel value="Select Your City" /> 
-                          <apex:selectList id="citiesOptions" value="{!selectedCity}" size="1" required="true">
+                          <apex:outputLabel value="Select Your City" styleClass="label"/> 
+                          <apex:selectList id="citiesOptions" value="{!selectedCity}" size="1" required="true" styleClass="item">
                               <apex:selectOptions value="{!CityOptions}"/>
                           </apex:selectList>
                       </apex:outputPanel>

@@ -1,5 +1,5 @@
 <apex:page controller="AL_ManagerPaymentHistoryController" showHeader="false" sidebar="false" lightningStylesheets="true">
-    <apex:slds />
+     <apex:slds />
     <!--ltng:require styles="/resource/SLDS_Library/assets/styles/salesforce-lightning-design-system-ltng.min.css" /-->
     <apex:stylesheet value="{!URLFOR($Resource.SLDS_Library, 'assets/styles/salesforce-lightning-design-system-ltng.min.css')}"/>
     <apex:form >
@@ -53,15 +53,24 @@
                     <!-- -->
                     <apex:outputText value="" /><br/>
                     <apex:outputText value="" /><br/>
+<apex:pageMessages />
         <apex:outputPanel rendered="{!NOT(ISNULL(recordToUpdate))}" id="PaymentToUpdate"> 
-                <apex:outputField value="{!recordToUpdate.Name}"/><br/>
-                <apex:outputField value="{!recordToUpdate.Payment_Month__c}"/><br/>
-                <apex:outputField value="{!recordToUpdate.Recommended_Payment_Sum__c }"/><br/>
-                <apex:outputField value="{!recordToUpdate.Remaining_Sum_for_Payment__c }"/><br/>
-                <apex:outputField value="{!recordToUpdate.Sum_Already_Payed__c }"/><br/>
-                <apex:inputText value="{!paymentAdjustment }"/><br/>
-                <apex:inputField value="{!recordToUpdate.Payment_Status__c }"/><br/>
-                <apex:commandButton id="submitUpdate" action="{!doUpdate}" value="Submit Update" />
+            
+                <apex:outputLabel value="Payment Name" for="name" style="margin-right: auto" />
+                <apex:outputField value="{!recordToUpdate.Name}" id="name" style="margin-left: auto" /><br/>
+                <apex:outputLabel value="Payment Month" for="month" style="margin-right: auto" />
+                <apex:outputField value="{!recordToUpdate.Payment_Month__c}" id="month" style="margin-left: auto" /><br/>
+                <apex:outputLabel value="Recommended Payment Sum" for="recommended" style="margin-right: auto"/>
+                <apex:outputField value="{!recordToUpdate.Recommended_Payment_Sum__c }" id="recommended" style="margin-left: auto" /><br/>
+                <apex:outputLabel value="Sum Remaining to Pay" for="remaining" style="margin-right: auto"/>
+                <apex:outputField value="{!recordToUpdate.Remaining_Sum_for_Payment__c }" id="remaining" style="margin-left: auto" /><br/>
+                <apex:outputLabel value="Sum already paid for month" for="already_paid" style="margin-right: auto"/>
+                <apex:outputField value="{!recordToUpdate.Sum_Already_Payed__c }" id="already_paid" style="margin-left: auto" /><br/>
+                <apex:outputLabel value="Payment Adjustment" for="adjustment" style="margin-right: auto" />
+                <apex:inputText value="{!paymentAdjustment }" id="adjustment" disabled="{! fullyPaid }" style="margin-left: auto"/><br/>
+                <apex:commandButton id="submitUpdate" action="{!doUpdate}" value="Submit Update" reRender="PaymentToUpdate"/>
+            
         </apex:outputPanel>
+
     </apex:form>
 </apex:page>

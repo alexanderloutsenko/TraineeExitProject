@@ -1,0 +1,83 @@
+<apex:page id="SendEmail" showHeader="false" sidebar="false" controller="AL_SendEmailController" > 
+<style>
+.grid {
+  display: grid;
+  grid-template-columns: 150px 400px;
+  grid-gap: 10px;
+  grid-template-rows: 20px 20px; 
+}
+.one {
+    grid-column: 1;
+    grid-row: 1;
+}
+.two {
+    grid-column: 2;
+    grid-row: 1;
+    padding: 5% 0;
+}
+.three {
+    grid-column: 1 ;
+    grid-row: 2;
+}
+.four {
+    grid-column: 2;
+    grid-row: 2;
+}
+</style>
+    <apex:define name="body">  
+      <center>
+        <apex:panelGrid bgcolor="white" columns="1"> 
+          <br/>
+          <br/>
+          <apex:panelGrid width="758" cellpadding="0" cellspacing="0" bgcolor="lightblue" columns="1" styleClass="topPanelContainer"> 
+            <br/>
+            <apex:outputPanel layout="block" styleClass="topPanel">
+              <apex:panelGrid width="758" cellpadding="0" cellspacing="0" bgcolor="white" columns="2">
+                <apex:panelGroup >
+                  <br/>
+                  <apex:outputText value="Send Email to Manager" style="text-shadow: 2px 2px 5px rgba(195, 0, 255);font-family:'Trebuchet MS', Verdana, sans-serif;font-size: 15px;color:blueviolet;"/>
+                  <br/>
+                  <apex:form id="theForm">
+                <apex:pageMessages id="error"/>
+                <apex:panelGrid columns="2" style="margin-top:1em;">
+                    <apex:outputPanel id="emal_section" rendered="{!success == null || success == false}" > 
+                    <div style="grid">
+                        <div style="one">
+                        <apex:outputLabel value="Enter reply address" for="reply_email" />
+                        </div>
+                        <div style="two">
+                        <apex:inputText id="reply_email" value="{!replyToEmail}"  /><br/>
+                        </div>
+                        <div style="three">
+                        <apex:outputLabel value="Enter email subject " for="subject"  />
+                        </div>
+                        <div style="four">
+                        <apex:inputText id="subject" value="{!subject}"  />                 
+                        </div>
+                    </div>
+                        <!--div style="item; width: 300px;" -->
+                        <apex:inputtextarea label="RichText"  richtext="true" value="{!emailBody}" 
+                                                    id="Body" cols="100" rows="15" />                  
+                        
+                    
+                        <br/>
+                      <apex:commandButton action="{!sendEmail}" value="Send Email" id="send_email" />
+                    </apex:outputPanel>
+                    <apex:outputPanel id="panel_after_success" >
+                        <apex:outputText rendered="{!success}" value="Your email has been sent successfully" style="font-size: 120%"/>
+                        <br/>
+                        <br/> 
+                        <apex:outputLink value="{!$Page.AL_UserHomePage+'?id='+$CurrentPage.parameters.id}" > Go back to User Home page </apex:outputLink> 
+                    </apex:outputPanel>  
+                </apex:panelGrid>
+                </apex:form>                  
+                <br/>
+                </apex:panelGroup>
+              </apex:panelGrid> 
+             </apex:outputPanel>
+          </apex:panelGrid> 
+       </apex:panelGrid>
+      </center>
+      <br/>
+    </apex:define>
+</apex:page>

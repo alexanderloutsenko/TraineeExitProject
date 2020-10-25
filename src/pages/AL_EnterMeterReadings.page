@@ -1,16 +1,24 @@
 <apex:page controller="AL_EnterMeterReadingsController" showHeader="false" sidebar="false">
+    <style>
+        .labelRight {
+            height: 50px;
+            background: grey;
+            display: flex;
+            align-items: center
+        }
+    </style>
   <apex:form id="theForm">
     <apex:pageBlock title="Enter Meter Readings">
         <apex:pageMessages />
         <!-- Show input fields section -->
-		<apex:outputPanel id="meter_section" rendered="{!ISNULL(existingMeters)}">
+		<apex:outputPanel id="meter_section" rendered="{!ISNULL(existingMeters)}" styleClass="labelRight">
              <apex:outputText value="Payment Month is {0,date,MMMM}" style="font-family:'Trebuchet MS', Verdana, sans-serif;font-size: 15px;color:blueviolet;">
                 <apex:param value="{!dynamicMonth}"  />
             </apex:outputText> 
             <apex:outputText value="" /><br/>
-    		<apex:inputField value="{! metersToInsert.Electricity_Meter_Readings__c }"/><br/>
-            <apex:inputField value="{! metersToInsert.Gas_Meter_Readings__c }" /><br/>
-    		<apex:inputField value="{! metersToInsert.Water_Meter_Readings__c }"/><br/>
+    		<apex:inputField value="{! metersToInsert.Electricity_Meter_Readings__c }"/><apex:outputLabel value="(kWt)  Elecricity Meter Readings" styleClass="labelRight"/><br/>
+            <apex:inputField value="{! metersToInsert.Gas_Meter_Readings__c }" /><apex:outputLabel value="(m3)  Gas Meter Readings"/><br/>
+    		<apex:inputField value="{! metersToInsert.Water_Meter_Readings__c }"/><apex:outputLabel value="(m3)  Watetr Meter Readings"/><br/>
         </apex:outputPanel>
         <!-- / Show input fields section -->
         <!-- Show read-only fields section -->
@@ -19,9 +27,9 @@
                 <apex:param value="{!dynamicMonth}"  />
             </apex:outputText> 
             <apex:outputText value="" /><br/>
-    		<apex:outputField value="{! existingMeters.Electricity_Meter_Readings__c }"/><br/>
-            <apex:outputField value="{! existingMeters.Gas_Meter_Readings__c }" /><br/>
-    		<apex:outputField value="{! existingMeters.Water_Meter_Readings__c }"/><br/>
+    		<apex:outputLabel value="  Elecricity Meter Readings (kWt)  " /><apex:outputField value="{! existingMeters.Electricity_Meter_Readings__c }"/><br/>
+    		<apex:outputLabel value="  Gas Meter Readings (m3)  " /><apex:outputField value="{! existingMeters.Gas_Meter_Readings__c }" /><br/>
+    		<apex:outputLabel value="  Water Meter Readings (m3)  " /><apex:outputField value="{! existingMeters.Water_Meter_Readings__c }"/><br/>
         </apex:outputPanel>
         <!-- / Show read-only fields section -->
         <apex:outputPanel >
@@ -33,7 +41,7 @@
 <!-- -->
 
         </apex:outputPanel>
-    </apex:pageBlock>
+   
 
   <apex:outputPanel title="List of Meter Readings" id="meter_table">
       <apex:dataTable value="{! metersFromController }" var="meter" style="border: 1px solid black; width: 100%; margin:10px; padding: 10px; ">
@@ -59,7 +67,8 @@
                         style="text-decoration:none;padding:4px;" disabled="{!ISNULL(existingMeters)}">
                         Do Payment
                     </apex:outputLink>
-      <apex:outputLink value="{!$Page.AL_UserHomePage+'?id='+$CurrentPage.parameters.id}" styleClass="btn" style="text-decoration:none;padding:4px;" >User Home Page</apex:outputLink>
     </apex:outputPanel>
+    <apex:outputLink value="{!$Page.AL_UserHomePage+'?id='+$CurrentPage.parameters.id}" styleClass="btn" style="text-decoration:none;padding:4px;" >User Home Page</apex:outputLink>
+</apex:pageBlock>
 </apex:form>
 </apex:page>

@@ -3,7 +3,7 @@ public class AL_DoPaymentController {
     public WrapPublicUserData activePublicUser { get; set; }
     public Monthly_Payment__c payRec { get; set; }
     public String selectedPaymentType { get; set; }
-    public Boolean fullyPayed { get; set; }
+    public Boolean fullyPaid { get; set; }
     //public Integer electro { get; set; }
     //public Integer gas { get; set; }
     //public Integer water { get; set; }
@@ -42,9 +42,9 @@ public class AL_DoPaymentController {
         } else {
            payRec = payRecsByUser[0]; // if payment already exists show meter readings in read-only mode
            if(payRec.Recommended_Payment_Sum__c == payRec.Sum_Already_Payed__c || payRec.Payment_Closed_Date__c != null){
-                fullyPayed = true;
+                fullyPaid = true;
            } else {
-                fullyPayed = false; 
+                fullyPaid = false; 
            }
            customSum = 0;          
         }
@@ -139,9 +139,10 @@ public class AL_DoPaymentController {
             regionId = u.Region__c;
             paymentMonth = dynamicMonth.format('MMMM');
             List<Rates__c> rates = [
-                     SELECT Electricity_Rate__c, Gas_Rate__c, Water_Rate__c, Region__r.Id
+                     SELECT Electricity_Rate__c, Gas_Rate__c, Water_Rate__c, Region__r.Id, Close_Date__c
 					   FROM Rates__c
-					  WHERE Region__c =: regionId
+                      WHERE Region__c =: regionId
+                        AND Close_Date__c = NULL
                        LIMIT 1];
             if(rates.size() > 0) {
                 rateId = rates[0].Id;

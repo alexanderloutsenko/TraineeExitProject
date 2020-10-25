@@ -40,7 +40,7 @@ public with sharing class AL_TestDataFactory {
             Region__c                        = regionId
         );
         insert standReadings;
-        ratesId = standReadings.Id;
+        standReadId = standReadings.Id;
         return standReadings;
     }    
 
@@ -75,8 +75,8 @@ public with sharing class AL_TestDataFactory {
                 Electricity_Meter_Readings__c = 500,
                 Gas_Meter_Readings__c         = 10,
                 Water_Meter_Readings__c       = 10,
-                Payment_Closed_Date__c        = Datetime.now().addMonths(-(i+1)),
-                Payment_Month__c              = Datetime.now().addMonths(-i).format('MMMM'),
+                Payment_Closed_Date__c        = System.today().addMonths(-i), //Datetime.now().addMonths(-i),
+                Payment_Month__c              = Datetime.now().addMonths(-(i+1)).format('MMMM'),
                 Payment_Fullness__c           = 'Fully',
                 Payment_Status__c             = 'Closed',
                 Public_User__c                = publicUserId,
