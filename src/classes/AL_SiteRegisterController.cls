@@ -6,18 +6,11 @@ global class AL_SiteRegisterController {
     public Id selectedRegion {get; set;}
     public String selectedState {get; set;}
     public String selectedCity {get; set;}
-    //public List<SelectOption> stateOptions {get; set;}
-    //public List<SelectOption> cityOptions {get; set;}
-    
-    
-    //public List<SelectOption> cityOptions = new List<SelectOption>(); 
     global String password {get; set {password = value == null ? value : value.trim(); } }
     global String userAlreadyExistsMsg = 'Login name you are trying to submit already in use by another user';
+    global String emptyRequiredFieldMsg = 'Populate all fields for successfull registration';
 
-    global AL_SiteRegisterController () { 
-        //getStateOptions();
-        //getCityOptions (); 
-    }
+    global AL_SiteRegisterController () { }
 
   public List<SelectOption> getStateOptions()
   {
@@ -73,7 +66,7 @@ global class AL_SiteRegisterController {
            List<Region__c> selectedRegion = [SELECT id FROM Region__c 
                                             WHERE State__c =: state 
                                             AND City__c =: city];
- System.debug('** selectedRegion='+selectedRegion);
+            //System.debug('** selectedRegion='+selectedRegion);
             return  selectedRegion[0].Id;
         } else { 
             return '';           
@@ -88,7 +81,7 @@ global class AL_SiteRegisterController {
             Public_User__c newUser = new Public_User__c();
             newUser.Login_Name__c = loginName;
             newUser.Password__c   = password;
-            newUser.Name          = name == null ? loginName : name;
+            newUser.Name          = name == '' ? loginName : name;
             newUser.Region__c     = regionId;
             
             insert newUser; 
@@ -97,11 +90,11 @@ global class AL_SiteRegisterController {
         } else {
             if(existingUser) {
                 // show error message if login name already exists
-                ApexPages.addMessage(new ApexPages.message(ApexPages.severity.WARNING,userAlreadyExistsMsg));
+                ApexPages.addMessage(new ApexPages.message(ApexPages.severity.WARNING, userAlreadyExistsMsg));
             }
-            if(String.isBlank(regionId) || String.isBlank(loginName) || String.isBlank(loginName) || selectedState == '-- None --' || selectedCity == '-- None --') {
+            if(String.isBlank(regionId) || String.isBlank(loginName) || String.isBlank(password) || selectedState == '-- None --' || selectedCity == '-- None --') {
                 // show error message if either state or city is not selected
-                ApexPages.addMessage(new ApexPages.message(ApexPages.severity.WARNING,'Populate all fields for successfull registration'));
+                ApexPages.addMessage(new ApexPages.message(ApexPages.severity.WARNING, emptyRequiredFieldMsg));
             }
             return null;
         }

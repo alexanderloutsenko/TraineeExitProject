@@ -6,6 +6,7 @@ public class AL_ManagerPaymentHistoryController {
     public String userId {get; set;}
     public Public_User__c manager {get; set;}
     public Decimal paymentAdjustment {get; set;}
+    public Decimal recommended {get; set;} 
     public boolean fullyPaid {get; set;}
     
     public AL_ManagerPaymentHistoryController() {
@@ -34,6 +35,9 @@ public class AL_ManagerPaymentHistoryController {
                                     FROM Monthly_Payment__c
                                     WHERE Region__c =: manager.Region__c
                                 ORDER BY CreatedDate DESC];
+
+      // nullify selected record container
+      recordToUpdate = null;                            
     }
 
     public PageReference fetchDetail () {
@@ -57,6 +61,8 @@ public class AL_ManagerPaymentHistoryController {
         paymentAdjustment = recordToUpdate.Remaining_Sum_for_Payment__c;
         if(recordToUpdate.Payment_Closed_Date__c != null) {
             fullyPaid = true;
+        } else {
+            fullyPaid = false; 
         }
         System.debug('** recordToUpdate = '+recordToUpdate);         
         //PageReference pageRef = new PageReference('/AL_ManagerPaymentHistory?id='+userId);
@@ -68,23 +74,30 @@ public class AL_ManagerPaymentHistoryController {
         // form data to update the record with
         if (paymentAdjustment == recordToUpdate.Remaining_Sum_for_Payment__c) {
             // close payment
+            recordToUpdate.Sum_Already_Payed__c = recordToUpdate.Sum_Already_Payed__c + paymentAdjustment;
             recordToUpdate.Payment_Fullness__c = 'Fully';
             recordToUpdate.Payment_Status__c = 'Closed';
             recordToUpdate.Payment_Closed_Date__c = System.today();
             update recordToUpdate;
-            recordToUpdate = null;
-        } 
-        if (paymentAdjustment < recordToUpdate.Remaining_Sum_for_Payment__c && paymentAdjustment != 0 && paymentAdjustment != null) {
-            // update payment without closing
-            recordToUpdate.Sum_Already_Payed__c = recordToUpdate.Sum_Already_Payed__c + paymentAdjustment;
-            recordToUpdate.Payment_Status__c = 'Partial';
-            update recordToUpdate;
-            recordToUpdate = null;
-        } 
-        if (paymentAdjustment > recordToUpdate.Remaining_Sum_for_Payment__c) {
-            // show warning
-            ApexPages.addMessage(new ApexPages.message(ApexPages.severity.WARNING,'Please enter a sum which is less than the sum remaining for payment'));
+            ApexPages.addMessage(new ApexPages.message(ApexPages.severity.WARNING,'The payment '+recordToUpdate.Name+' has been succfully updated'));
+            //recordToUpdate = null;            
+        } else {
+            if (paymentAdjustment < recordToUpdate.Remaining_Sum_for_Payment__c && paymentAdjustment != 0 && paymentAdjustment != null) {
+                // update payment without closing
+                recordToUpdate.Sum_Already_Payed__c = recordToUpdate.Sum_Already_Payed__c + paymentAdjustment;
+                recordToUpdate.Payment_Status__c = 'Partial';
+                update recordToUpdate;
+                //recordToUpdate = null; 
+                ApexPages.addMessage(new ApexPages.message(ApexPages.severity.WARNING,'The payment '+recordToUpdate.Name+' has been succfully updated'));           
+            } else   { //if (paymentAdjustment > recordToUpdate.Remaining_Sum_for_Payment__c)
+                // show warning
+                ApexPages.addMessage(new ApexPages.message(ApexPages.severity.WARNING,'Please enter a sum which is less than the sum remaining for payment'));
+                return null;
+            }
         }
-        return null;
+        
+        paymentAdjustment = 0;
+        //return null;
+        return new Pagereference ('/AL_ManagerPaymentHistory?id='+userId);
     }
 }

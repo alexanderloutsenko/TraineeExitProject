@@ -25,6 +25,10 @@
                   <br/>
                   <apex:outputLink value="{!$Page.AL_UpdateRates+'?id='+$CurrentPage.parameters.id}" > Update rates for your region </apex:outputLink>
                   <br/>
+                  <br/>
+                  <apex:outputLink value="{!$Page.AL_SiteLogin}" > Log out </apex:outputLink>
+                  <br/>
+                  <br/>
                 </apex:panelGroup>
               </apex:panelGrid> 
             </apex:outputPanel>

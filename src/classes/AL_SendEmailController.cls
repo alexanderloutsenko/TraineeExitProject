@@ -33,7 +33,7 @@ public class AL_SendEmailController {
             Messaging.sendEmail(new Messaging.SingleEmailMessage[] { email });
             success = true;
         }catch(exception e){
-            apexpages.addmessage(new apexpages.message(apexpages.severity.error,e.getMessage()));
+            ApexPages.addMessage(new ApexPages.Message(ApexPages.severity.error,e.getMessage()));
         }        
         return null;        
     }

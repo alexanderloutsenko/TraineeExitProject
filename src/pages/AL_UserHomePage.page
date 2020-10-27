@@ -28,6 +28,9 @@
                   <apex:outputLink value="{!$Page.AL_SendEmail+'?id='+$CurrentPage.parameters.id}" > Send Email to Manager </apex:outputLink>
                   <br/>
                   <br/>
+                  <apex:outputLink value="{!$Page.AL_SiteLogin}" > Log out </apex:outputLink>
+                  <br/>
+                  <br/>
                   <!--apex:outputLink value="{!$Page.AL_ChangeResidence+'?id='+$CurrentPage.parameters.id}" styleClass="btn" style="text-decoration:none;padding:4px;" >Change Region Details
               </apex:outputLink-->
                 </apex:panelGroup>

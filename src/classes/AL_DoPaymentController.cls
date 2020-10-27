@@ -4,9 +4,6 @@ public class AL_DoPaymentController {
     public Monthly_Payment__c payRec { get; set; }
     public String selectedPaymentType { get; set; }
     public Boolean fullyPaid { get; set; }
-    //public Integer electro { get; set; }
-    //public Integer gas { get; set; }
-    //public Integer water { get; set; }
     public Decimal customSum { get; set; }
     public String noPaymentYet = 'You don\'t have payment record generated for last month yet';
      
@@ -45,6 +42,7 @@ public class AL_DoPaymentController {
                 fullyPaid = true;
            } else {
                 fullyPaid = false; 
+                selectedPaymentType = 'Partially';
            }
            customSum = 0;          
         }
@@ -70,23 +68,30 @@ public class AL_DoPaymentController {
         if(alreadyPayedSum == 0) {
             if(mustPay > wantPay && wantPay != 0) {
                 selectedPaymentType = 'Partially';
-                //System.debug('(1) if(mustPay > wantPay && wantPay != 0) = '+selectedPaymentType);                  
+                System.debug('(1a) if(mustPay > wantPay && wantPay != 0) = '+selectedPaymentType);
+                System.debug('(1a) mustPay = '+ mustPay+' & wantPay = '+wantPay+' & alreadyPayedSum = '+alreadyPayedSum);
+
             } else {
                 selectedPaymentType = 'Fully';
                 customSum = payRec.Recommended_Payment_Sum__c;             
-                //System.debug('(2) ELSE (mustPay <= wantPay) || wantPay == 0) = '+selectedPaymentType);  
+                System.debug('(1b) ELSE (mustPay <= wantPay) || wantPay == 0) = '+selectedPaymentType);
+                System.debug('(1b) mustPay = '+ mustPay+' & wantPay = '+wantPay+' & alreadyPayedSum = '+alreadyPayedSum);  
             }
-            System.debug(' ** checkPaymentFullness mehtod inside of  if(alreadyPayedSum == 0) and customSum ='+customSum);
+            System.debug(' ** (1c) checkPaymentFullness mehtod inside of  if(alreadyPayedSum == 0) and customSum = '+customSum);
+            System.debug('(1c) mustPay = '+ mustPay+' & wantPay = '+wantPay+' & alreadyPayedSum = '+alreadyPayedSum);
         } else {
             if(mustPay > wantPay + alreadyPayedSum && wantPay != 0) {
                 selectedPaymentType = 'Partially';                
-                //System.debug('(1) if(mustPay > wantPay && wantPay != 0) = '+selectedPaymentType);                  
+                System.debug('(2a) if(mustPay > wantPay && wantPay != 0) = '+selectedPaymentType); 
+                System.debug('(2a) mustPay = '+ mustPay+' & wantPay = '+wantPay+' & alreadyPayedSum = '+alreadyPayedSum);
             } else {
                 selectedPaymentType = 'Fully';                         
-                //System.debug('(2) ELSE (mustPay <= wantPay) || wantPay == 0) = '+selectedPaymentType);  
+                System.debug('(2b) ELSE (mustPay <= wantPay) || wantPay == 0) = '+selectedPaymentType);  
+                System.debug('(2b) mustPay = '+ mustPay+' & wantPay = '+wantPay+' & alreadyPayedSum = '+alreadyPayedSum);
             }
             customSum = customSum + alreadyPayedSum; 
-            System.debug(' ** checkPaymentFullness mehtod inside of ELSE of if(alreadyPayedSum == 0) and customSum ='+customSum);                       
+            System.debug(' ** (2c) checkPaymentFullness mehtod inside of ELSE of if(alreadyPayedSum == 0) and customSum ='+customSum);
+            System.debug('(2c) mustPay = '+ mustPay+' & wantPay = '+wantPay+' & alreadyPayedSum = '+alreadyPayedSum);                       
         } 
     }
     
@@ -97,11 +102,11 @@ public class AL_DoPaymentController {
 
         //second, form Payment record to fulfill it with payment data     
         checkPaymentFullness(payRec.Recommended_Payment_Sum__c, customSum, payRec.Sum_Already_Payed__c);
-    
+        System.debug(':: inside doPayment method (after checkPaymentFullness() method call) - payRec.Recommended_Payment_Sum__c = '+ payRec.Recommended_Payment_Sum__c+' & customSum = '+customSum+' & payRec.Sum_Already_Payed__c = '+payRec.Sum_Already_Payed__c);
         Monthly_Payment__c payRecToUpdate = new Monthly_Payment__c();
         payRecToUpdate.Id = payRec.Id;
         payRecToUpdate.Sum_Already_Payed__c = customSum; 
-        System.debug('** before insert customSum='+customSum); 
+        System.debug(':: before insert payRecToUpdate.Sum_Already_Payed__c = '+payRecToUpdate.Sum_Already_Payed__c+' & customSum = '+customSum); 
         if(selectedPaymentType == 'Partially') {
             payRecToUpdate.Payment_Status__c = 'Partial';// consider to get rid of this field by removing it from the object
         } else {
@@ -110,7 +115,7 @@ public class AL_DoPaymentController {
         }
         payRecToUpdate.Payment_Fullness__c = selectedPaymentType;
       		 
-        System.debug('** before insert record='+payRecToUpdate);  
+        System.debug(':: before insert record='+payRecToUpdate);  
         //update Monthly_Payment__c record with payment data
         try{
             update payRecToUpdate;

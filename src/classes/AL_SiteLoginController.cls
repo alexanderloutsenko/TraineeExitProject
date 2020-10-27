@@ -4,7 +4,7 @@ global class AL_SiteLoginController {
     global String userId {get; set;}
     global String userStartUrl = '/AL_UserHomePage';
     global String managerStartUrl = '/AL_ManagerHomePage';
-    private Boolean isManager = false;
+    public Boolean isManager = false;
    global String userNotFoundMsg = 'You was not found within a list of registered users. Check the correctness of your username and/or password';    
 
     global AL_SiteLoginController () {  }

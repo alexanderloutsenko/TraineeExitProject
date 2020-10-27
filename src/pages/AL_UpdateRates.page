@@ -1,34 +1,53 @@
 <apex:page controller="AL_UpdateRatesController" showHeader="false" sidebar="false" >
-        <apex:form id="theForm">
-          <apex:pageBlock title="Update Your Region's Rates">
+  <style>
+    .box {
+    display: grid;
+    grid-template-columns: 100px 50px; /*1fr 1fr*/
+    grid-gap: 10px 2em; /*20px gap between row tracks, and a 2em gap between column tracks.*/
+    margin: 10px;
+    }
+
+    .box :first-child {
+    align-self: center;    
+
+    body {
+        margin: 20px 20px 20px 20px;
+    }
+</style>           
+<apex:form id="theForm">
+          <!--apex:pageBlock title="Update Your Region's Rates"-->
+    <apex:outputText value="Set new rates for '{!regionName}' region for {!month}" style="text-shadow: 2px 2px 5px rgb(195, 0, 255); margin: 25px; font-family:'Trebuchet MS', Verdana, sans-serif;font-size: 15px;color:blueviolet;" />
+
               <apex:pageMessages />
               <!-- Show input fields section -->
-              <apex:outputPanel id="input_section" >
-                   <apex:outputText value="Set new rates for '{!regionName}' region for {!month}" style="font-family:'Trebuchet MS', Verdana, sans-serif;font-size: 15px;color:blueviolet;"/>
-                <apex:panelGrid columns="2" style="margin-top:1em;" >
+              <apex:outputPanel id="input_section" styleClass="box">
+
+                <!--apex:panelGrid columns="2" style="margin-top:1em;" -->
                   <apex:outputLabel value="Enter Rates for Electricity" for="electro"/>
                   <apex:inputText value="{! electro }" required="true" id="electro"/>
                   <apex:outputLabel value="Enter Rates for gas" for="gas"/>
                   <apex:inputText value="{! gas }" required="true" id="gas"/>
                   <apex:outputLabel value="Enter Rates for Water" for="water"/>                  
                   <apex:inputText value="{! water }" required="true" id="water"/>
-                </apex:panelGrid> 
+                <!--/apex:panelGrid--> 
               </apex:outputPanel>
               <!-- / Show input fields section -->
 
               <apex:outputPanel >
-                  <apex:commandButton action="{! createRate }" value="Submit New Rates" reRender="JS_alert"/>
+                  <apex:commandButton action="{! createRate }" value="Submit New Rates" style="margin:10px;"/> <!-- reRender="JS_alert" -->
+                  <apex:outputLink value="{!$Page.AL_ManagerHomePage+'?id='+$CurrentPage.parameters.id}" 
+                  styleClass="btn" style="text-decoration:none;padding:4px;margin:10px;">Manager Home Page</apex:outputLink>
                   <!--apex:actionFunction name="reRenderTable"  /--> <!-- reRender="meter_table,show_meter_readings_section" -->
       <!-- 
       <apex:actionSupport event="onchange" action="{!getSelected}" rerender="timeline" oncomplete="reRenderMessages();"/>
       <apex:actionFunction name='reRenderMessages' reRender='messages'/> -->
       <!-- -->      
               </apex:outputPanel>
-              <apex:outputPanel rendered="{!alertMessage} != ''" id="JS_alert">
+              <!--apex:outputPanel rendered="{!alertMessage != '' }" id="JS_alert">
                    <script type="text/javascript">
                        alert('{!alertMessage}');
                     </script>
-              </apex:outputPanel>
-          </apex:pageBlock>
+              </apex:outputPanel-->
+          <!--/apex:pageBlock-->
     </apex:form>
 </apex:page>

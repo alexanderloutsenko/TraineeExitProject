@@ -1,17 +1,53 @@
 <apex:page controller="AL_ManagerPaymentHistoryController" showHeader="false" sidebar="false" lightningStylesheets="true">
-     <apex:slds />
-    <!--ltng:require styles="/resource/SLDS_Library/assets/styles/salesforce-lightning-design-system-ltng.min.css" /-->
-    <apex:stylesheet value="{!URLFOR($Resource.SLDS_Library, 'assets/styles/salesforce-lightning-design-system-ltng.min.css')}"/>
-    <apex:form >
-        <apex:outputPanel title="List of Payments" id="payment_table">           
+     <apex:slds /> 
+    <apex:stylesheet value="{!URLFOR($Resource.SLDS_Library, 'assets/styles/salesforce-lightning-design-system-ltng.min.css')}" />
+    <style>
+        .box {
+        display: grid;
+        grid-template-columns: 200px 100px; /*1fr 1fr*/
+        grid-gap: 10px 2em; /*20px gap between row tracks, and a 2em gap between column tracks.*/
+        margin: 10px;
+        }
+
+        .box :first-child {
+        align-self: center;    
+
+        body {
+            margin: 20px 20px 20px 20px;
+        }
+    </style>    
+    
+    <apex:form id="theForm">
+    <apex:outputPanel>
+        <apex:pageMessages  id="warnings"/>
+    </apex:outputPanel>
+        <apex:panelGrid width="500" cellpadding="0" cellspacing="0" bgcolor="lightblue" columns="1" style="topPanel"/> 
+        <apex:outputText value="Payment History" styleClass="slds-text-heading_medium" style="text-shadow: 2px 2px 5px rgb(195, 0, 255); margin-left:10px; font-family:'Trebuchet MS', Verdana, sans-serif; color:blueviolet;" /> <!-- style="margin-bottom: 15px; font-family:'Trebuchet MS', Verdana, sans-serif;font-size: 15px;color:blueviolet;" -->
+        <apex:outputText value="" styleClass="slds-text-heading_medium"  />
+        <!-- ERROR ALERT DIV -->
+    <!--apex:outputPanel layout="block" id="msg_block" style="display: none;">
+        <div id="err_wrapper"
+             class="slds-notify slds-notify--alert slds-theme--warning slds-theme--alert-texture"
+             role="alert">
+            <h2>
+                <div xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <svg aria-hidden="true"
+                         class="slds-icon icon-text-email slds-icon--small slds-m-right--x-small">
+                        <use xlink:href="{!URLFOR($Resource.SLDS_Library, '/assets/icons/utility-sprite/svg/symbols.svg#')}"></use>
+                    </svg>
+                    <span id="err_text"></span>
+                </div>
+            </h2>
+        </div>
+    </apex:outputPanel-->
+        <apex:outputPanel title="List of Payments" id="payment_table"> 
             <!-- -->
-            <apex:dataTable value="{! paymentsFromController }" var="payment" style="border: 1px solid black; width: 100%; margin:10px; padding: 10px; ">
+            <apex:dataTable value="{! paymentsFromController }" var="payment" styleClass="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped">
                 <apex:column>
                   <apex:facet name="header">Click to update</apex:facet>
-                    <apex:commandLink value="{!payment.Name}" action="{!fetchDetail}"  >
+                    <apex:commandLink value="{!payment.Name}" title="{!payment.Name}" action="{!fetchDetail}"  styleClass="slds-truncate">
                         <apex:param assignTo="{!paymentId}" name="{!payment.Id}" value="{!payment.Id}"/>
                     </apex:commandLink>   
-                    <apex:outputText value="{! payment.Name }"/ >
                 </apex:column>
                 <apex:column>
                     <apex:facet name="header">User</apex:facet>
@@ -39,8 +75,8 @@
                 </apex:column>
                 <apex:column>
                     <apex:facet name="header">Payment Date</apex:facet>
-                    <apex:outputText value="{! payment.Payment_Closed_Date__c }">
-                  		<!--apex:param value="{! payment.Payment_Closed_Date__c }"  /-->
+                    <apex:outputText value="{0,date,dd/MM/yyyy}">
+                  		<apex:param value="{! payment.Payment_Closed_Date__c }"  />
                     </apex:outputText> 
                 </apex:column>
             </apex:dataTable>
@@ -48,29 +84,33 @@
         </apex:outputPanel>
 
             <apex:outputLink value="{!$Page.AL_ManagerHomePage+'?id='+$CurrentPage.parameters.id}" 
-                            styleClass="btn" style="text-decoration:none;padding:4px;" >Manager Home Page</apex:outputLink>
-
+                            styleClass="slds-button slds-button_neutral" style="margin: 10px;">Manager Home Page</apex:outputLink>
                     <!-- -->
                     <apex:outputText value="" /><br/>
                     <apex:outputText value="" /><br/>
-<apex:pageMessages />
-        <apex:outputPanel rendered="{!NOT(ISNULL(recordToUpdate))}" id="PaymentToUpdate"> 
-            
-                <apex:outputLabel value="Payment Name" for="name" style="margin-right: auto" />
-                <apex:outputField value="{!recordToUpdate.Name}" id="name" style="margin-left: auto" /><br/>
-                <apex:outputLabel value="Payment Month" for="month" style="margin-right: auto" />
-                <apex:outputField value="{!recordToUpdate.Payment_Month__c}" id="month" style="margin-left: auto" /><br/>
-                <apex:outputLabel value="Recommended Payment Sum" for="recommended" style="margin-right: auto"/>
-                <apex:outputField value="{!recordToUpdate.Recommended_Payment_Sum__c }" id="recommended" style="margin-left: auto" /><br/>
-                <apex:outputLabel value="Sum Remaining to Pay" for="remaining" style="margin-right: auto"/>
-                <apex:outputField value="{!recordToUpdate.Remaining_Sum_for_Payment__c }" id="remaining" style="margin-left: auto" /><br/>
-                <apex:outputLabel value="Sum already paid for month" for="already_paid" style="margin-right: auto"/>
-                <apex:outputField value="{!recordToUpdate.Sum_Already_Payed__c }" id="already_paid" style="margin-left: auto" /><br/>
-                <apex:outputLabel value="Payment Adjustment" for="adjustment" style="margin-right: auto" />
-                <apex:inputText value="{!paymentAdjustment }" id="adjustment" disabled="{! fullyPaid }" style="margin-left: auto"/><br/>
-                <apex:commandButton id="submitUpdate" action="{!doUpdate}" value="Submit Update" reRender="PaymentToUpdate"/>
-            
+        <apex:outputPanel rendered="{!NOT(ISNULL(recordToUpdate))}">
+            <apex:outputText value=" {!recordToUpdate.Name} Details" styleClass="slds-text-heading_medium" style="text-shadow: 2px 2px 5px rgb(195, 0, 255); margin-left:10px; font-family:'Trebuchet MS', Verdana, sans-serif; color:blueviolet;" />
         </apex:outputPanel>
 
+        <apex:outputPanel rendered="{!NOT(ISNULL(recordToUpdate))}" id="paymentToUpdate" styleClass="box">            
+                <apex:outputLabel value="Payment Name" for="name" style="margin-right: auto" />
+                <apex:outputField value="{!recordToUpdate.Name}" id="name" style="margin-left: auto" />
+                <apex:outputLabel value="Payment Month" for="month" style="margin-right: auto" />
+                <apex:outputField value="{!recordToUpdate.Payment_Month__c}" id="month" style="margin-left: auto" />
+                <apex:outputLabel value="Recommended Payment Sum" for="recommended" style="margin-right: auto"/>
+                <apex:outputField value="{!recordToUpdate.Recommended_Payment_Sum__c }" id="recommended" style="margin-left: auto" />
+                <!--apex:outputLabel value="Sum Remaining to Pay" for="remaining" style="margin-right: auto"/>
+                <apex:outputField value="{!recordToUpdate.Remaining_Sum_for_Payment__c }" id="remaining" style="margin-left: auto" /-->
+                <apex:outputLabel value="Sum already paid for month" for="already_paid" style="margin-right: auto"/>
+                <apex:outputField value="{!recordToUpdate.Sum_Already_Payed__c }" id="already_paid" style="margin-left: auto" />
+                <apex:outputLabel value="Payment Adjustment" for="adjustment" style="margin-right: auto" rendered="{! fullyPaid == false}" />
+                <apex:inputText value="{!paymentAdjustment }" id="adjustment" style="margin-left: auto" rendered="{! fullyPaid == false}" /><!-- disabled="{! fullyPaid }" -->
+        </apex:outputPanel>
+        <apex:outputPanel rendered="{!NOT(ISNULL(recordToUpdate))}" id="submitUpdate"> 
+                <apex:commandButton value="Submit Update" action="{!doUpdate}" 
+                                    oncomplete="refreshPaymentSection();" disabled="{! fullyPaid }" styleClass="slds-button slds-button_neutral" style="margin: 10px;"/>    
+                <apex:actionFunction name="refreshPaymentSection" reRender="paymentToUpdate, payment_table"/>
+            </apex:outputPanel>
     </apex:form>
+
 </apex:page>

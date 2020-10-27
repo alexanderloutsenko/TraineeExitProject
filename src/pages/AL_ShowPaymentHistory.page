@@ -1,6 +1,6 @@
 <apex:page controller="AL_ShowPaymentHistoryContoller" showHeader="false" sidebar="false">
 
-    <apex:pageBlock title="List of Meter Readings" id="meter_table">
+    <apex:pageBlock title="List of Payments per Month" id="meter_table">
       <apex:pageBlockTable value="{! payRecsByUser }" var="meter" >
           <apex:column value="{! meter.Payment_Month__c }"/>
           <apex:column value="{! meter.Electricity_Meter_Readings__c }"/>
@@ -12,9 +12,9 @@
           <apex:column value="{! meter.Region__c  }"/>         
       </apex:pageBlockTable>
       <apex:outputText value="" />
-      <apex:outputLink value="{!$Page.AL_DoPayment+'?id='+$CurrentPage.parameters.id}" styleClass="btn" 
+      <apex:outputLink value="{!$Page.AL_EnterMeterReadings+'?id='+$CurrentPage.parameters.id}" styleClass="btn" 
                         style="text-decoration:none;padding:4px;">
-                        Do Payment
+                        Enter Meter Readings
                     </apex:outputLink>
       <apex:outputLink value="{!$Page.AL_UserHomePage+'?id='+$CurrentPage.parameters.id}" styleClass="btn" 
                         style="text-decoration:none;padding:4px;" >User Home Page</apex:outputLink>

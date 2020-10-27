@@ -1,50 +1,58 @@
 <apex:page controller="AL_EnterMeterReadingsController" showHeader="false" sidebar="false">
     <style>
-        .labelRight {
-            height: 50px;
-            background: grey;
-            display: flex;
-            align-items: center
-        }
-    </style>
+.box {
+  display: grid;
+  grid-template-columns: 200px 50px; /*1fr 1fr*/
+  grid-gap: 10px 2em; /*20px gap between row tracks, and a 2em gap between column tracks.*/
+}
+
+.box :first-child {
+    align-self: center;    
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+th {
+  background-color: lightblue;
+  color: white;
+}
+
+table { border: 1px solid black; width: 100%; margin:10px 20px 10px 0; padding: 10px; }
+
+body {
+    margin: 20px 20px 20px 20px;
+}
+
+</style>
+<body>
   <apex:form id="theForm">
-    <apex:pageBlock title="Enter Meter Readings">
-        <apex:pageMessages />
+    <apex:pageMessages />
+    <apex:outputText value="Payment Month is {!month}" style="text-shadow: 2px 2px 5px rgb(195, 0, 255); margin-bottom: 25px; font-family:'Trebuchet MS', Verdana, sans-serif;font-size: 15px;color:blueviolet;" />
         <!-- Show input fields section -->
-		<apex:outputPanel id="meter_section" rendered="{!ISNULL(existingMeters)}" styleClass="labelRight">
-             <apex:outputText value="Payment Month is {0,date,MMMM}" style="font-family:'Trebuchet MS', Verdana, sans-serif;font-size: 15px;color:blueviolet;">
-                <apex:param value="{!dynamicMonth}"  />
-            </apex:outputText> 
-            <apex:outputText value="" /><br/>
-    		<apex:inputField value="{! metersToInsert.Electricity_Meter_Readings__c }"/><apex:outputLabel value="(kWt)  Elecricity Meter Readings" styleClass="labelRight"/><br/>
-            <apex:inputField value="{! metersToInsert.Gas_Meter_Readings__c }" /><apex:outputLabel value="(m3)  Gas Meter Readings"/><br/>
-    		<apex:inputField value="{! metersToInsert.Water_Meter_Readings__c }"/><apex:outputLabel value="(m3)  Watetr Meter Readings"/><br/>
+		<apex:outputPanel id="meter_section" rendered="{!ISNULL(existingMeters)}" styleClass="box">         
+    		<apex:outputLabel value=" Elecricity Meter Readings (kWt)" /><apex:inputField value="{! metersToInsert.Electricity_Meter_Readings__c }" style="label" />
+            <apex:outputLabel value="Gas Meter Readings (m3)"  /><apex:inputField value="{! metersToInsert.Gas_Meter_Readings__c }" style="label" />
+    		<apex:outputLabel value="Water Meter Readings (m3)"  /><apex:inputField value="{! metersToInsert.Water_Meter_Readings__c }" style="label" />
         </apex:outputPanel>
         <!-- / Show input fields section -->
         <!-- Show read-only fields section -->
-		<apex:outputPanel id="show_meter_readings_section" rendered="{!NOT(ISNULL(existingMeters))}">
-             <apex:outputText value="You have already entered meter readings for {0,date,MMMM}" style="font-family:'Trebuchet MS', Verdana, sans-serif;font-size: 15px;color:blueviolet;">
-                <apex:param value="{!dynamicMonth}"  />
-            </apex:outputText> 
+		<apex:outputPanel id="show_meter_readings_section" rendered="{!NOT(ISNULL(existingMeters))}" styleClass="box">
+            <apex:outputText value="You have already entered meter readings for {!month}" style="font-family:'Trebuchet MS', Verdana, sans-serif;font-size: 10px;color:orange;"></apex:outputText>
             <apex:outputText value="" /><br/>
-    		<apex:outputLabel value="  Elecricity Meter Readings (kWt)  " /><apex:outputField value="{! existingMeters.Electricity_Meter_Readings__c }"/><br/>
-    		<apex:outputLabel value="  Gas Meter Readings (m3)  " /><apex:outputField value="{! existingMeters.Gas_Meter_Readings__c }" /><br/>
-    		<apex:outputLabel value="  Water Meter Readings (m3)  " /><apex:outputField value="{! existingMeters.Water_Meter_Readings__c }"/><br/>
+    		<apex:outputLabel value="Elecricity Meter Readings (kWt)" /><apex:outputField value="{! existingMeters.Electricity_Meter_Readings__c }" />
+    		<apex:outputLabel value="Gas Meter Readings (m3)"  /><apex:outputField value="{! existingMeters.Gas_Meter_Readings__c }"  />
+    		<apex:outputLabel value="Water Meter Readings (m3)"  /><apex:outputField value="{! existingMeters.Water_Meter_Readings__c }"  />
         </apex:outputPanel>
         <!-- / Show read-only fields section -->
+        <!-- submit button -->
         <apex:outputPanel >
-            <apex:commandButton action="{! submitNewMeter }" reRender="meter_table, theForm" value="Submit Meter Readings" disabled="{!NOT(ISNULL(existingMeters))}"/>
-            <!--apex:actionFunction name="reRenderTable"  /--> <!-- reRender="meter_table,show_meter_readings_section" -->
-<!-- 
-<apex:actionSupport event="onchange" action="{!getSelected}" rerender="timeline" oncomplete="reRenderMessages();"/>
-<apex:actionFunction name='reRenderMessages' reRender='messages'/> -->
-<!-- -->
-
-        </apex:outputPanel>
-   
-
+            <apex:commandButton action="{! submitNewMeter }" reRender="meter_table, theForm" value="Submit Meter Readings" disabled="{!NOT(ISNULL(existingMeters))}" styleClass="buttonMargin"/>
+        </apex:outputPanel>  
+        <!-- List of Meter Readings -->
   <apex:outputPanel title="List of Meter Readings" id="meter_table">
-      <apex:dataTable value="{! metersFromController }" var="meter" style="border: 1px solid black; width: 100%; margin:10px; padding: 10px; ">
+      <apex:dataTable value="{! metersFromController }" var="meter" style="width: 500px; margin:10px; padding: 10px; "> <!-- styleClass="zebraRows" style="border: 1px solid black; width: 100%; margin:10px; padding: 10px; "> -->
           <apex:column>
             <apex:facet name="header">Payment Month</apex:facet>
             <apex:outputText value="{! meter.Payment_Month__c }"/ >
@@ -69,6 +77,6 @@
                     </apex:outputLink>
     </apex:outputPanel>
     <apex:outputLink value="{!$Page.AL_UserHomePage+'?id='+$CurrentPage.parameters.id}" styleClass="btn" style="text-decoration:none;padding:4px;" >User Home Page</apex:outputLink>
-</apex:pageBlock>
 </apex:form>
+</body>
 </apex:page>

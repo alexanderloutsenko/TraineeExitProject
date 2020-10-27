@@ -1,6 +1,6 @@
 <apex:page controller="AL_DoPaymentController" showHeader="false" sidebar="false" id="thePage">
     <h1 style="title"> 
-        Enter Meter Readings 
+        Do Payment for Last Month 
     </h1>
 	<h2>
         {!activePublicUser.pubUserName}
@@ -9,7 +9,7 @@
          <apex:pageBlock rendered="{!NOT(ISNULL(payRec))}">
              <apex:pageblockSection title="Actual Meter Readings"  id="detailSection" columns="1" >
               <apex:pageBlockSectionItem >
-                  Payment_Month__c: <apex:outputText value="{0,date,MMMM}">
+                  Payment Month: <apex:outputText value="{0,date,MMMM}">
                   		<apex:param value="{!dynamicMonth}"  />
                   </apex:outputText> 
               </apex:pageBlockSectionItem>              
@@ -24,14 +24,14 @@
               </apex:pageBlockSectionItem>
             </apex:pageblockSection>
          </apex:pageBlock>                
-     <!-- end of Show_Meter_Readings form -->    
+     <!-- end of Show_Meter_Readings pane -->    
      <apex:form id="Form3"> 
          <apex:outputPanel id="PaymentPanel"> 
         <apex:pageBlock id="PaymentBlock" rendered="{!NOT(ISNULL(payRec))}">
              <apex:pageblockSection title="Payment Details"  id="PaymentSection" columns="1">          
               <apex:pageBlockSectionItem >
-                  Payment_Fullness__c: 
-                  <apex:selectList id="Payment_Fullness" value="{!selectedPaymentType}" size="1" required="true">
+                  Payment Fullness: 
+                  <apex:selectList id="Payment_Fullness" value="{!selectedPaymentType}" size="1" disabled="{!fullyPaid}">
                     <apex:selectOptions value="{!options}"/>
                         <apex:actionSupport event="onchange"  reRender="CustomSumField"/>
                   </apex:selectList>
@@ -45,20 +45,18 @@
               <apex:pageBlockSectionItem >
                   Sum Already Payed: <apex:outputField value="{!payRec.Sum_Already_Payed__c}"/>
               </apex:pageBlockSectionItem>
-              <apex:outputText>If you desire to pay only part of recommended sum enter the sum in the below field and click Do Payment button.</apex:outputText>
               <apex:pageBlockSectionItem >
                     Enter your sum for partial payment: <apex:inputText value="{!customSum}" disabled="{!fullyPaid}" id="CustomSumField" rendered="{!fullyPaid == false || selectedPaymentType == 'Partially'}"/> 
               </apex:pageBlockSectionItem>
-
+              <!--apex:outputText value="If you want to pay full sum just click Do Payment button"></apex:outputText-->
                 <br/>
-                <apex:outputText>If you desire to pay recommended sum fully just click Do Payment button.</apex:outputText>
                  <apex:commandButton id="submitPayment" action="{!doPayment}" value="Do Payment" reRender="PaymentPanel"  disabled="{!fullyPaid}"> <!-- oncomplete="refreshPaymentSection();" -->
                 <!--apex:actionFunction name="refreshPaymentSection" reRender="Form3"/-->
-                <!--apex:actionPoller reRender="PaymentSection" timeout="3000" /-->
                 </apex:commandButton>
                 <apex:outputLink value="{!$Page.AL_UserHomePage+'?id='+$CurrentPage.parameters.id}" styleClass="btn" style="text-decoration:none;padding:4px;" >User Home Page</apex:outputLink>
              </apex:pageblockSection>
         </apex:pageBlock>
         </apex:outputPanel>
+        <apex:pageMessages />
 		</apex:form>
 </apex:page>

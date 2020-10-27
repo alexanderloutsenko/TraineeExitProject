@@ -2,8 +2,9 @@ public class AL_EnterMeterReadingsController {
 
     public Monthly_Payment__c metersToInsert {get; set;}
     public Monthly_Payment__c existingMeters {get; set;}
-    public static Datetime dynamicMonth { get { return Datetime.now().addMonths(-1); } }
-    public static String userId = System.CurrentPageReference().getParameters().get('id');
+    //public static Datetime dynamicMonth { get { return Datetime.now().addMonths(-1); } }
+    public String month { get { return Datetime.now().addMonths(-1).format('MMMM'); } }//static
+    public String userId = System.CurrentPageReference().getParameters().get('id');//static
     public Public_User__c currentUser ;
     public Boolean paymentExists { get; set; }
     public static Integer count = 0;
@@ -29,13 +30,13 @@ public class AL_EnterMeterReadingsController {
                         Payment_Month__c              		 
                    FROM Monthly_Payment__c
                   WHERE Public_User__c = :userId
-                    AND Payment_Month__c = :dynamicMonth.format('MMMM')];
+                    AND Payment_Month__c = :month]; //dynamicMonth.format('MMMM')
       
         if(payRecsByUser.size() > 0) {
             existingMeters = payRecsByUser[0]; // if payment already exists show meter readings in read-only mode
             System.debug('** exists meters = '+existingMeters);
-            count++;
-            System.debug('** count='+count);
+            //count++;
+            //System.debug('** count='+count);
             //paymentExists = true;
         } else {
             //initialize the object to avoid NullPointerException on Payment creation
@@ -44,7 +45,7 @@ public class AL_EnterMeterReadingsController {
     }
       
         public PageReference submitNewMeter () {
-            metersToInsert.Payment_Month__c = dynamicMonth.format('MMMM');
+            metersToInsert.Payment_Month__c = month; //dynamicMonth.format('MMMM')
             metersToInsert.Region__c = currentUser.Region__c;
             metersToInsert.Public_User__c = userId;
             List<Rates__c> rates = [
@@ -57,14 +58,13 @@ public class AL_EnterMeterReadingsController {
             }
             //insert new record
             insert metersToInsert;
-            // nullify the object to clean up the fields on Create Payment section on the VF page
-            //metersToInsert = new Monthly_Payment__c();
+
             checkPaymentExist();
-            return new Pagereference ('/AL_EnterMeterReadings?id='+userId);
-            //return null;
+            //return new Pagereference ('/AL_EnterMeterReadings?id='+userId);
+            return null;
         }
         
-        public List<Monthly_Payment__c> getMetersFromController () { //getContsFromController
+        public List<Monthly_Payment__c> getMetersFromController () { 
             List<Monthly_Payment__c> metersList = [SELECT 
                                         Payment_Month__c , 
                                         Electricity_Meter_Readings__c,
